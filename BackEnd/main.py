@@ -1,3 +1,4 @@
+import bcrypt
 import tornado.ioloop
 import tornado.web
 import mysql.connector
@@ -8,22 +9,25 @@ class LoginHandler(tornado.web.RequestHandler):
         self.render("LogIn.html")
 
     def post(self):
-        username = self.get_argument("username", "")
-        password = self.get_argument("password", "")
+        body = tornado.escape.json_decode(self.request.body)
+        email = self.get_argument("email", "")
+        password = body.get("password", "")
         # Logica di autenticazione da implementare
-        self.write(f"Login ricevuto per: {username}")
+
 
 
 class RegisterHandler(tornado.web.RequestHandler):
     def get(self):
         self.render("Register.html")
 
-    def post(self):
-        username = self.get_argument("username", "")
-        email    = self.get_argument("email", "")
-        password = self.get_argument("password", "")
-        # Logica di registrazione da implementare
-        self.write(f"Registrazione ricevuta per: {username} ({email})")
+
+    async def post(self):
+        body = tornado.escape.json_decode(self.request.body)
+        email = body.get("email", "").strip()
+        password = body.get("password", "")
+        hashed = bcrypt.hashpw(password.encode(), bcrypt.gensalt())
+        self.write(f"Registrazione ricevuta per: {email} ({hashed})")
+        #return self.write_json({"message": "Registrazione completata"}, 201)
 
 
 def make_app():

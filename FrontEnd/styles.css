@@ -1,5 +1,5 @@
 /* Reset e Stile Generale */
-        body {
+        body.log-sign {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             display: flex;
@@ -78,3 +78,83 @@
             color: #764ba2;
             text-decoration: none;
         }
+
+
+
+    :root {
+      --sidebar-width: 250px;
+      --bg-color: #2c3e50;
+      --accent-color: #3498db;
+    }
+
+    body.home-page { font-family: sans-serif; margin: 0; display: flex; }
+
+    /* Checkbox nascosta */
+    #menu-toggle { display: none; }
+
+    /* Barra Laterale */
+    .sidebar {
+      position: fixed;
+      left: calc(-1 * var(--sidebar-width));
+      top: 0;
+      width: var(--sidebar-width);
+      height: 100%;
+      background: var(--bg-color);
+      transition: all 0.4s ease;
+      z-index: 1000;
+    }
+
+    /* Contenuto Menù */
+    .sidebar ul { list-style: none; padding: 50px 20px; margin: 0; }
+    .sidebar ul li { margin-bottom: 20px; }
+    .sidebar ul li a {
+      color: white;
+      text-decoration: none;
+      font-size: 1.1rem;
+      transition: color 0.3s;
+    }
+    .sidebar ul li a:hover { color: var(--accent-color); }
+
+    /* Pulsante Freccia */
+    .toggle-btn {
+      position: absolute;
+      right: -40px; /* Esce fuori dal menù */
+      top: 20px;
+      width: 40px;
+      height: 40px;
+      background: var(--bg-color);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      border-radius: 0 5px 5px 0;
+    }
+
+    /* Disegno della freccia (SVG) */
+    .arrow {
+      fill: white;
+      transition: transform 0.4s ease;
+      width: 20px;
+    }
+
+    /* LOGICA DI APERTURA */
+    #menu-toggle:checked ~ .sidebar {
+      left: 0;
+    }
+
+    /* Ruota la freccia quando aperto */
+    #menu-toggle:checked ~ .sidebar .arrow {
+      transform: rotate(180deg);
+    }
+
+    /* Overlay per il resto della pagina (opzionale) */
+    .content { padding: 20px; transition: margin-left 0.4s; }
+    #menu-toggle:checked ~ .content { margin-left: var(--sidebar-width); }
+
+.checkbox{position: absolute;
+left:30px;
+}
+
+.window-text{
+color: white;
+}
