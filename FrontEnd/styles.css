@@ -151,10 +151,67 @@
     .content { padding: 20px; transition: margin-left 0.4s; }
     #menu-toggle:checked ~ .content { margin-left: var(--sidebar-width); }
 
-.checkbox{position: absolute;
-left:30px;
+.checkbox {
+  /* Rimuoviamo position: absolute e left: 30px */
+  margin-right: 10px;    /* Spazio tra checkbox e testo */
+  vertical-align: middle; /* Allinea la casella alla metà del testo */
+  cursor: pointer;
 }
 
-.window-text{
-color: white;
+.window-text {
+  color: white;
+  cursor: pointer;
+  display: inline-block;
+  vertical-align: middle;
+  line-height: 2; /* Aumenta un po' lo spazio verticale tra le righe */
+  margin-top: -30px;
+}
+
+.search-bar{
+position:absolute;
+display: flex;
+    justify-content: center; /* Centra orizzontalmente */
+    align-items: center;
+width:1000px;
+align:center;
+}
+
+.barra{
+
+    background-color: #white;
+    color: white;
+    border-width: 2px;
+    border-color; solid black;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 1rem;
+    font-weight: bold;
+    transition: background 0.3s;
+    white-space: nowrap;
+    margin-left: 700px;
+    margin-top: 20px;
+    width: 500px;
+    height: 45px;
+}
+
+.search-button {
+    flex-shrink: 0; /* non si allarga e non si restringe */
+    margin-top:18px;
+    width: 45px;
+    height: 45px;
+    padding: 0;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    box-sizing: border-box;
+    background-color: #FF402B;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+}
+
+.search-button img {
+    width: 30px;
+    height: 30px;
+    display: block;
 }
