@@ -89,6 +89,8 @@
 
     body.home-page { font-family: sans-serif; margin: 0; display: flex; }
 
+    body.product { font-family: sans-serif; margin: 0; display: flex; }
+
     /* Checkbox nascosta */
     #menu-toggle { display: none; }
 

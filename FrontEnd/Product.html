@@ -1,26 +1,51 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="it">
 <head>
     <meta charset="UTF-8">
     <title>Prodotto</title>
+    <link rel="stylesheet" href="/static/styles.css">
 </head>
-<body>
-<input type="checkbox" id="menu-toggle">
-  <nav class="sidebar">
-    <label for="menu-toggle" class="toggle-btn">
-      <svg class="arrow" viewBox="0 0 24 24"><path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z"/></svg>
-    </label>
-<label style="color: white; position: absolute; text-align:center; margin-left:70px; font-size:35px; margin-top:10px">Menù</label>
+<body class="product">
 
-<form style="margin-top: 85px; margin-left: 10px"><!--action="/action_page.php"-->
-  <input type="checkbox" id="vehicle1" name="vehicle1" value="Bike" class="checkbox">
-  <label for="vehicle1" class="window-text"> I have a bike </label ><br>
-  <input type="checkbox" id="vehicle2" name="vehicle2" value="Car" class="checkbox">
-  <label for="vehicle2" class="window-text"> I have a car</label><br>
-  <input type="checkbox" id="vehicle3" name="vehicle3" value="Boat" class="checkbox">
-  <label for="vehicle3" class="window-text"> I have a boat</label><br><br>
-  <input type="submit" value="Submit" style="margin-left: -5px">
-</form>
+<input type="checkbox" id="menu-toggle">
+
+<nav class="sidebar">
+    <label for="menu-toggle" class="toggle-btn">
+        <svg class="arrow" viewBox="0 0 24 24">
+            <path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z"/>
+        </svg>
+    </label>
+
+    <label style="color: white; position: absolute; text-align:center; margin-left:70px; font-size:35px; margin-top:10px">
+        Menù
+    </label>
+
+    <form method="GET" action="" style="margin-top: 85px; margin-left: 10px">
+
+        <!-- ✅ Tag dinamici dal database -->
+        {% for tag in tags %}
+            <input
+                type="checkbox"
+                id="tag-{{ tag.id }}"
+                name="tag"
+                value="{{ tag.id }}"
+                class="checkbox"
+
+            >
+            <label for="tag-{{ tag.id }}" class="window-text"> {{ tag.nome }} </label><br>
+        {% empty %}
+            <p style="color: white; margin-left: 5px;">Nessun tag disponibile</p>
+        {% endfor %}
+
+        <br>
+        <input type="submit" value="Filtra" style="margin-left: -5px">
+    </form>
+
 </nav>
+
+<div class="content">
+    <!-- Qui va il contenuto principale della pagina -->
+</div>
+
 </body>
 </html>
