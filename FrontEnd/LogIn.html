@@ -3,32 +3,93 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pagina di Login</title>
+    <title>Login — Magazzino Fermi</title>
     <link rel="stylesheet" href="styles.css">
 </head>
-<body class="log-sign">
+<body class="auth-page">
 
-    <div class="login-container">
+    <div class="auth-card">
+        <div class="auth-logo">ITIS Fermi · Magazzino Lab</div>
         <h2>Accedi</h2>
-        <form action="/login" method="POST">
-            <div class="input-group">
-                <label for="username">Username o Email</label>
-                <input type="text" id="username" name="username" required>
-            </div>
+        <p class="subtitle">Inserisci le tue credenziali per continuare.</p>
 
-            <div class="input-group">
-                <label for="password">Password</label>
-                <input type="password" id="password" name="password" required>
-            </div>
+        <div class="error-msg" id="errorMsg"></div>
 
-            <button type="submit">Entra</button>
-        </form>
+        <div class="form-group">
+            <label for="username">Username</label>
+            <input type="text" id="username" placeholder="username" autocomplete="username">
+        </div>
 
-        <div class="footer-links">
-            <p><a href="#">Password dimenticata?</a></p>
-            <p>Non hai un account? <a href="#">Registrati</a></p>
+        <div class="form-group">
+            <label for="password">Password</label>
+            <input type="password" id="password" placeholder="••••••••" autocomplete="current-password">
+        </div>
+
+        <button class="btn btn-primary" id="loginBtn" onclick="doLogin()">
+            Entra
+        </button>
+
+        <div class="auth-footer">
+            Non hai un account? <a href="Signin.html">Registrati</a>
         </div>
     </div>
 
+    <script src="api.js"></script>
+    <script>
+        // Se già loggato, vai alla home
+        if (localStorage.getItem('access')) {
+            window.location.href = 'Home.html';
+        }
+
+        // Invio con Enter
+        document.getElementById('password').addEventListener('keydown', e => {
+            if (e.key === 'Enter') doLogin();
+        });
+
+        async function doLogin() {
+            const btn = document.getElementById('loginBtn');
+            const err = document.getElementById('errorMsg');
+            const username = document.getElementById('username').value.trim();
+            const password = document.getElementById('password').value;
+
+            if (!username || !password) {
+                showError('Compila tutti i campi.');
+                return;
+            }
+
+            btn.disabled = true;
+            btn.textContent = 'Accesso in corso...';
+            err.classList.remove('visible');
+
+            try {
+                const res = await fetch(`${BASE_URL}/api/auth/login/`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username, password })
+                });
+
+                const data = await res.json();
+
+                if (res.ok) {
+                    localStorage.setItem('access', data.access);
+                    localStorage.setItem('refresh', data.refresh);
+                    window.location.href = 'Home.html';
+                } else {
+                    showError('Username o password errati.');
+                }
+            } catch {
+                showError('Impossibile contattare il server. Riprova.');
+            } finally {
+                btn.disabled = false;
+                btn.textContent = 'Entra';
+            }
+        }
+
+        function showError(msg) {
+            const err = document.getElementById('errorMsg');
+            err.textContent = msg;
+            err.classList.add('visible');
+        }
+    </script>
 </body>
 </html>

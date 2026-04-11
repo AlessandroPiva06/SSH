@@ -1,35 +1,180 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="it">
 <head>
     <meta charset="UTF-8">
-    <title>Home Page</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home — Magazzino Fermi</title>
     <link rel="stylesheet" href="styles.css">
 </head>
-<body class="home-page">
+<body class="app-page">
 
-  <input type="checkbox" id="menu-toggle">
+<!-- Header -->
+<header class="app-header">
+    <div class="header-logo">MagazzinoFermi</div>
+    <div class="header-sep"></div>
+    <span class="header-user" id="headerUser"></span>
+    <button class="btn btn-ghost btn-sm" onclick="logout()">Esci</button>
+</header>
 
-  <nav class="sidebar">
-    <label for="menu-toggle" class="toggle-btn">
-      <svg class="arrow" viewBox="0 0 24 24"><path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z"/></svg>
-    </label>
-<label style="color: white; position: absolute; text-align:center; margin-left:70px; font-size:35px; margin-top:10px">Menù</label>
+<!-- Body -->
+<div class="app-body">
 
-<form style="margin-top: 85px; margin-left: 10px"><!--action="/action_page.php"-->
-  <input type="checkbox" id="vehicle1" name="vehicle1" value="Bike" class="checkbox">
-  <label for="vehicle1" class="window-text"> I have a bike </label ><br>
-  <input type="checkbox" id="vehicle2" name="vehicle2" value="Car" class="checkbox">
-  <label for="vehicle2" class="window-text"> I have a car</label><br>
-  <input type="checkbox" id="vehicle3" name="vehicle3" value="Boat" class="checkbox">
-  <label for="vehicle3" class="window-text"> I have a boat</label><br><br>
-  <input type="submit" value="Submit" style="margin-left: -5px">
-</form>
-</nav>
-<form action="/search" method="get" class="search-bar">
-    <input type="search" name="q" placeholder="Cerca nel sito..." aria-label="Cerca" class="barra">
-    <button type="submit" class="search-button">
-    <img src="../img/lens.png" alt="Cerca" width="25px" height="25px" style="position:center">
-        </button>
-</form>
+    <!-- Sidebar -->
+    <nav class="sidebar">
+        <div class="sidebar-section">
+            <div class="sidebar-label">Navigazione</div>
+            <a href="Home.html" class="active">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+                Dashboard
+            </a>
+            <a href="Componenti.html">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+                Componenti
+            </a>
+            <a href="Movimenti.html">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
+                Movimenti
+            </a>
+        </div>
+        <div class="sidebar-section" id="adminSection" style="display:none">
+            <div class="sidebar-label">Gestione</div>
+            <a href="Utenti.html">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                Utenti
+            </a>
+            <a href="Liste.html">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+                Liste
+            </a>
+        </div>
+    </nav>
+
+    <!-- Main -->
+    <main class="app-main">
+
+        <div class="page-header">
+            <div>
+                <div class="page-title">Dashboard</div>
+                <div class="page-subtitle">Panoramica del magazzino</div>
+            </div>
+        </div>
+
+        <!-- Stats -->
+        <div class="stats-bar" id="statsBar">
+            <div class="stat-card">
+                <div class="stat-label">Componenti totali</div>
+                <div class="stat-value accent" id="statTotali">—</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Sotto scorta</div>
+                <div class="stat-value danger" id="statScorta">—</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Famiglie</div>
+                <div class="stat-value" id="statFamiglie">—</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Movimenti oggi</div>
+                <div class="stat-value warn" id="statMovimenti">—</div>
+            </div>
+        </div>
+
+        <!-- Componenti recenti -->
+        <div class="page-header" style="margin-bottom:1rem">
+            <div class="page-title" style="font-size:1.1rem">Ultimi componenti aggiunti</div>
+            <a href="Componenti.html" class="btn btn-ghost btn-sm">Vedi tutti →</a>
+        </div>
+
+        <div id="componentList">
+            <div class="loading-wrap"><div class="spinner"></div></div>
+        </div>
+
+    </main>
+</div>
+
+<div id="toast"></div>
+
+<script src="api.js"></script>
+<script>
+    requireAuth();
+
+    const user = getUser();
+
+    // Mostra utente in header
+    if (user) {
+        const ruoloClass = { admin: 'badge-admin', tecnico: 'badge-tecnico', professore: 'badge-prof' };
+        document.getElementById('headerUser').innerHTML =
+            `${user.username || ''} <span class="badge ${ruoloClass[user.ruolo] || ''}">${user.ruolo || ''}</span>`;
+
+        if (['admin', 'tecnico'].includes(user.ruolo)) {
+            document.getElementById('adminSection').style.display = 'block';
+        }
+    }
+
+    async function loadDashboard() {
+        try {
+            const [componenti, famiglie, movimenti] = await Promise.all([
+                api('/api/componenti/'),
+                api('/api/famiglie/'),
+                api('/api/movimenti/'),
+            ]);
+
+            // Stats
+            const sottoScorta = componenti.filter(c => c.quantita <= c.quantita_minima).length;
+            const oggi = new Date().toISOString().split('T')[0];
+            const movOggi = movimenti.filter(m => m.timestamp?.startsWith(oggi)).length;
+
+            document.getElementById('statTotali').textContent   = componenti.length;
+            document.getElementById('statScorta').textContent   = sottoScorta;
+            document.getElementById('statFamiglie').textContent = famiglie.length;
+            document.getElementById('statMovimenti').textContent = movOggi;
+
+            // Ultimi 6 componenti
+            const ultimi = [...componenti].slice(-6).reverse();
+            renderComponenti(ultimi);
+
+        } catch (e) {
+            document.getElementById('componentList').innerHTML =
+                `<div class="empty-state"><p>Errore nel caricamento dati.</p></div>`;
+        }
+    }
+
+    function renderComponenti(lista) {
+        const el = document.getElementById('componentList');
+        if (!lista.length) {
+            el.innerHTML = `<div class="empty-state"><p>Nessun componente trovato.</p></div>`;
+            return;
+        }
+
+        el.innerHTML = `<div class="cards-grid">${lista.map(c => {
+            const pct = c.quantita_minima > 0 ? c.quantita / c.quantita_minima : Infinity;
+            const statusClass = pct <= 1 ? 'qty-low' : pct <= 1.5 ? 'qty-warn' : 'qty-ok';
+            const statusText  = pct <= 1 ? '⚠ scorta' : pct <= 1.5 ? '~ attenzione' : '✓ ok';
+
+            return `
+            <div class="card" onclick="window.location.href='Product.html?id=${c.id}'">
+                <div class="card-code">#${c.id}</div>
+                <div class="card-title">${c.nome}</div>
+                <div class="qty-bar">
+                    <div>
+                        <div class="qty-num">${c.quantita}</div>
+                        <div class="qty-label">pz in magazzino</div>
+                    </div>
+                    <div class="qty-status ${statusClass}">${statusText}</div>
+                </div>
+            </div>`;
+        }).join('')}</div>`;
+    }
+
+    function showToast(msg, type = '') {
+        const t = document.getElementById('toast');
+        t.textContent = msg;
+        t.className = `show ${type}`;
+        setTimeout(() => t.className = '', 3000);
+    }
+
+    loadDashboard();
+</script>
+
 </body>
 </html>

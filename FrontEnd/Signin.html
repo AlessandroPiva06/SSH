@@ -3,41 +3,114 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Registrazione</title>
+    <title>Registrazione — Magazzino Fermi</title>
     <link rel="stylesheet" href="styles.css">
 </head>
-<body class="log-sign">
+<body class="auth-page">
 
-    <div class="login-container">
+    <div class="auth-card">
+        <div class="auth-logo">ITIS Fermi · Magazzino Lab</div>
         <h2>Registrati</h2>
-        <form action="/register" method="POST">
-            <div class="input-group">
-                <label for="username">Username</label>
-                <input type="text" id="username" name="username" required>
-            </div>
+        <p class="subtitle">Crea il tuo account. Verrà approvato da un tecnico o admin.</p>
 
-            <div class="input-group">
-                <label for="email">Email</label>
-                <input type="email" id="email" name="email" required>
-            </div>
+        <div class="error-msg"   id="errorMsg"></div>
+        <div class="success-msg" id="successMsg"></div>
 
-            <div class="input-group">
-                <label for="password">Password</label>
-                <input type="password" id="password" name="password" required>
-            </div>
+        <div class="form-group">
+            <label for="username">Username</label>
+            <input type="text" id="username" placeholder="username" autocomplete="username">
+        </div>
 
-            <div class="input-group">
-                <label for="confirm_password">Conferma Password</label>
-                <input type="password" id="confirm_password" name="confirm_password" required>
-            </div>
+        <div class="form-group">
+            <label for="email">Email</label>
+            <input type="email" id="email" placeholder="nome@fermi.it" autocomplete="email">
+        </div>
 
-            <button type="submit">Crea account</button>
-        </form>
+        <div class="form-group">
+            <label for="ruolo">Ruolo</label>
+            <select id="ruolo">
+                <option value="professore">Professore</option>
+                <option value="tecnico">Tecnico</option>
+            </select>
+        </div>
 
-        <div class="footer-links">
-            <p>Hai già un account? <a href="/login">Accedi</a></p>
+        <div class="form-group">
+            <label for="password">Password</label>
+            <input type="password" id="password" placeholder="min. 8 caratteri" autocomplete="new-password">
+        </div>
+
+        <div class="form-group">
+            <label for="confirm">Conferma Password</label>
+            <input type="password" id="confirm" placeholder="••••••••" autocomplete="new-password">
+        </div>
+
+        <button class="btn btn-primary" id="signBtn" onclick="doSignin()">
+            Crea account
+        </button>
+
+        <div class="auth-footer">
+            Hai già un account? <a href="LogIn.html">Accedi</a>
         </div>
     </div>
 
+    <script src="api.js"></script>
+    <script>
+        async function doSignin() {
+            const btn      = document.getElementById('signBtn');
+            const errEl    = document.getElementById('errorMsg');
+            const okEl     = document.getElementById('successMsg');
+            const username = document.getElementById('username').value.trim();
+            const email    = document.getElementById('email').value.trim();
+            const ruolo    = document.getElementById('ruolo').value;
+            const password = document.getElementById('password').value;
+            const confirm  = document.getElementById('confirm').value;
+
+            errEl.classList.remove('visible');
+            okEl.classList.remove('visible');
+
+            if (!username || !email || !password || !confirm) {
+                return showError('Compila tutti i campi.');
+            }
+            if (password !== confirm) {
+                return showError('Le password non coincidono.');
+            }
+            if (password.length < 8) {
+                return showError('La password deve avere almeno 8 caratteri.');
+            }
+
+            btn.disabled = true;
+            btn.textContent = 'Registrazione in corso...';
+
+            try {
+                const res = await fetch(`${BASE_URL}/api/auth/registrazione/`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username, email, password, ruolo })
+                });
+
+                const data = await res.json();
+
+                if (res.ok) {
+                    okEl.textContent = 'Account creato! Attendi l\'approvazione da parte di un admin o tecnico.';
+                    okEl.classList.add('visible');
+                    setTimeout(() => window.location.href = 'LogIn.html', 3000);
+                } else {
+                    const msgs = Object.values(data).flat().join(' ');
+                    showError(msgs || 'Errore durante la registrazione.');
+                }
+            } catch {
+                showError('Impossibile contattare il server.');
+            } finally {
+                btn.disabled = false;
+                btn.textContent = 'Crea account';
+            }
+        }
+
+        function showError(msg) {
+            const err = document.getElementById('errorMsg');
+            err.textContent = msg;
+            err.classList.add('visible');
+        }
+    </script>
 </body>
 </html>
