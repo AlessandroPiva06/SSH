@@ -1,180 +1,905 @@
 <!DOCTYPE html>
 <html lang="it">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Home — Magazzino Fermi</title>
-    <link rel="stylesheet" href="styles.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Magazzino Fermi</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #0f1117;
+      --surface: #1a1d27;
+      --surface2: #21253a;
+      --border: #2a2d3a;
+      --accent: #e8b86d;
+      --accent2: #c8965a;
+      --text: #e8e9ef;
+      --muted: #7a7f96;
+      --danger: #e05c5c;
+      --success: #5cb88c;
+      --sidebar-w: 240px;
+    }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+    }
+
+    /* ── SIDEBAR ── */
+    .sidebar {
+      width: var(--sidebar-w);
+      background: var(--surface);
+      border-right: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      position: fixed;
+      top: 0; left: 0; bottom: 0;
+      z-index: 100;
+      transition: transform 0.3s ease;
+    }
+
+    .sidebar-logo {
+      padding: 24px 20px 20px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .sidebar-logo .icon {
+      width: 36px; height: 36px;
+      background: var(--accent);
+      border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 18px; flex-shrink: 0;
+    }
+
+    .sidebar-logo .brand {
+      font-family: 'DM Serif Display', serif;
+      font-size: 1.15rem;
+      line-height: 1.2;
+    }
+    .sidebar-logo .brand span { color: var(--accent); }
+
+    nav { flex: 1; padding: 16px 12px; overflow-y: auto; }
+
+    .nav-section {
+      font-size: 0.7rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--muted);
+      padding: 12px 8px 6px;
+    }
+
+    .nav-link {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 9px 12px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 0.9rem;
+      color: var(--muted);
+      transition: all 0.15s;
+      user-select: none;
+      text-decoration: none;
+      margin-bottom: 2px;
+    }
+
+    .nav-link:hover { background: var(--surface2); color: var(--text); }
+    .nav-link.active { background: rgba(232,184,109,0.12); color: var(--accent); font-weight: 600; }
+
+    .nav-link .icon { font-size: 1rem; width: 20px; text-align: center; }
+
+    .sidebar-footer {
+      padding: 16px 12px;
+      border-top: 1px solid var(--border);
+    }
+
+    .user-badge {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 12px;
+      background: var(--surface2);
+      border-radius: 8px;
+    }
+
+    .user-avatar {
+      width: 32px; height: 32px;
+      background: var(--accent);
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 13px; font-weight: 700;
+      color: #0f1117;
+      flex-shrink: 0;
+    }
+
+    .user-info { flex: 1; min-width: 0; }
+    .user-name { font-size: 0.85rem; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .user-role { font-size: 0.75rem; color: var(--muted); }
+
+    .logout-btn {
+      background: none; border: none;
+      color: var(--muted); cursor: pointer;
+      font-size: 1.1rem;
+      padding: 4px;
+      transition: color 0.2s;
+    }
+    .logout-btn:hover { color: var(--danger); }
+
+    /* ── MAIN ── */
+    .main {
+      margin-left: var(--sidebar-w);
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+
+    .topbar {
+      height: 60px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      padding: 0 28px;
+      gap: 16px;
+      position: sticky;
+      top: 0;
+      background: var(--bg);
+      z-index: 50;
+    }
+
+    .topbar h1 {
+      font-family: 'DM Serif Display', serif;
+      font-size: 1.3rem;
+      flex: 1;
+    }
+
+    .search-wrap {
+      position: relative;
+    }
+
+    .search-wrap input {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--text);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.88rem;
+      padding: 8px 12px 8px 34px;
+      width: 220px;
+      transition: border-color 0.2s;
+    }
+
+    .search-wrap input:focus { outline: none; border-color: var(--accent); }
+
+    .search-wrap .search-icon {
+      position: absolute;
+      left: 10px; top: 50%;
+      transform: translateY(-50%);
+      color: var(--muted);
+      font-size: 0.85rem;
+    }
+
+    .content { padding: 28px; flex: 1; }
+
+    /* ── VIEWS ── */
+    .view { display: none; }
+    .view.active { display: block; }
+
+    /* ── STATS CARDS ── */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 16px;
+      margin-bottom: 28px;
+    }
+
+    .stat-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 20px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .stat-card::after {
+      content: '';
+      position: absolute;
+      top: 0; right: 0;
+      width: 80px; height: 80px;
+      background: radial-gradient(circle, rgba(232,184,109,0.08) 0%, transparent 70%);
+    }
+
+    .stat-label { font-size: 0.78rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 8px; }
+    .stat-value { font-family: 'DM Serif Display', serif; font-size: 2rem; color: var(--text); }
+    .stat-sub   { font-size: 0.78rem; color: var(--muted); margin-top: 4px; }
+    .stat-accent { color: var(--accent); }
+    .stat-danger { color: var(--danger); }
+
+    /* ── TABLE ── */
+    .table-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 16px;
+    }
+
+    .table-title {
+      font-family: 'DM Serif Display', serif;
+      font-size: 1.15rem;
+    }
+
+    .btn {
+      padding: 8px 16px;
+      border-radius: 8px;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+      border: none;
+      transition: all 0.15s;
+    }
+
+    .btn-primary { background: var(--accent); color: #0f1117; }
+    .btn-primary:hover { background: var(--accent2); }
+    .btn-ghost { background: var(--surface); color: var(--text); border: 1px solid var(--border); }
+    .btn-ghost:hover { border-color: var(--accent); color: var(--accent); }
+
+    .table-wrap {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      overflow: hidden;
+    }
+
+    table { width: 100%; border-collapse: collapse; }
+
+    thead tr { border-bottom: 1px solid var(--border); }
+
+    th {
+      padding: 12px 16px;
+      text-align: left;
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+      color: var(--muted);
+    }
+
+    td {
+      padding: 12px 16px;
+      font-size: 0.88rem;
+      border-bottom: 1px solid rgba(42,45,58,0.6);
+    }
+
+    tr:last-child td { border-bottom: none; }
+    tbody tr:hover { background: var(--surface2); }
+
+    .badge {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 20px;
+      font-size: 0.75rem;
+      font-weight: 600;
+    }
+
+    .badge-ok      { background: rgba(92,184,140,0.15); color: var(--success); }
+    .badge-warn    { background: rgba(224,92,92,0.15); color: var(--danger); }
+    .badge-neutral { background: rgba(122,127,150,0.15); color: var(--muted); }
+
+    /* ── LOADING / EMPTY ── */
+    .loader {
+      text-align: center;
+      padding: 48px;
+      color: var(--muted);
+      font-size: 0.9rem;
+    }
+
+    .spinner {
+      display: inline-block;
+      width: 20px; height: 20px;
+      border: 2px solid var(--border);
+      border-top-color: var(--accent);
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+      margin-bottom: 10px;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ── MODAL ── */
+    .overlay {
+      display: none;
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,0.6);
+      z-index: 200;
+      align-items: center;
+      justify-content: center;
+    }
+    .overlay.open { display: flex; }
+
+    .modal {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 32px;
+      width: 100%;
+      max-width: 440px;
+      animation: fadeUp 0.25s ease both;
+    }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(16px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .modal h3 {
+      font-family: 'DM Serif Display', serif;
+      font-size: 1.3rem;
+      margin-bottom: 20px;
+    }
+
+    .modal .field { margin-bottom: 14px; }
+
+    .modal label {
+      display: block;
+      font-size: 0.78rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+      color: var(--muted);
+      margin-bottom: 6px;
+    }
+
+    .modal input, .modal select {
+      width: 100%;
+      padding: 10px 14px;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--text);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.9rem;
+    }
+
+    .modal input:focus, .modal select:focus {
+      outline: none;
+      border-color: var(--accent);
+    }
+
+    .modal-actions {
+      display: flex;
+      gap: 10px;
+      margin-top: 24px;
+    }
+  </style>
 </head>
-<body class="app-page">
+<body>
 
-<!-- Header -->
-<header class="app-header">
-    <div class="header-logo">MagazzinoFermi</div>
-    <div class="header-sep"></div>
-    <span class="header-user" id="headerUser"></span>
-    <button class="btn btn-ghost btn-sm" onclick="logout()">Esci</button>
-</header>
+  <!-- ── SIDEBAR ── -->
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      <div class="icon">⚙️</div>
+      <div class="brand">Magazzino<br><span>Fermi</span></div>
+    </div>
 
-<!-- Body -->
-<div class="app-body">
+    <nav>
+      <div class="nav-section">Principale</div>
+      <a class="nav-link active" onclick="showView('dashboard')">
+        <span class="icon">📊</span> Dashboard
+      </a>
+      <a class="nav-link" onclick="showView('componenti')">
+        <span class="icon">🔩</span> Componenti
+      </a>
+      <a class="nav-link" onclick="showView('magazzino')">
+        <span class="icon">📦</span> Movimenti
+      </a>
 
-    <!-- Sidebar -->
-    <nav class="sidebar">
-        <div class="sidebar-section">
-            <div class="sidebar-label">Navigazione</div>
-            <a href="Home.html" class="active">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
-                Dashboard
-            </a>
-            <a href="Componenti.html">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
-                Componenti
-            </a>
-            <a href="Movimenti.html">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
-                Movimenti
-            </a>
-        </div>
-        <div class="sidebar-section" id="adminSection" style="display:none">
-            <div class="sidebar-label">Gestione</div>
-            <a href="Utenti.html">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-                Utenti
-            </a>
-            <a href="Liste.html">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
-                Liste
-            </a>
-        </div>
+      <div class="nav-section">Liste</div>
+      <a class="nav-link" onclick="showView('esperienze')">
+        <span class="icon">🧪</span> Esperienze
+      </a>
+      <a class="nav-link" onclick="showView('acquisti')">
+        <span class="icon">🛒</span> Acquisti
+      </a>
+
+      <div class="nav-section" id="adminSection" style="display:none">Admin</div>
+      <a class="nav-link admin-only" style="display:none" onclick="showView('utenti')">
+        <span class="icon">👥</span> Utenti
+      </a>
     </nav>
 
-    <!-- Main -->
-    <main class="app-main">
+    <div class="sidebar-footer">
+      <div class="user-badge">
+        <div class="user-avatar" id="userAvatar">?</div>
+        <div class="user-info">
+          <div class="user-name" id="userName">Caricamento…</div>
+          <div class="user-role" id="userRole">—</div>
+        </div>
+        <button class="logout-btn" onclick="logout()" title="Esci">⏻</button>
+      </div>
+    </div>
+  </aside>
 
-        <div class="page-header">
-            <div>
-                <div class="page-title">Dashboard</div>
-                <div class="page-subtitle">Panoramica del magazzino</div>
-            </div>
+  <!-- ── MAIN ── -->
+  <div class="main">
+    <div class="topbar">
+      <h1 id="pageTitle">Dashboard</h1>
+      <div class="search-wrap">
+        <span class="search-icon">🔍</span>
+        <input type="search" id="searchInput" placeholder="Cerca componenti…" oninput="filterTable()">
+      </div>
+    </div>
+
+    <div class="content">
+
+      <!-- DASHBOARD -->
+      <div class="view active" id="view-dashboard">
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-label">Componenti</div>
+            <div class="stat-value" id="stat-comp">—</div>
+            <div class="stat-sub">tipi catalogati</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Sotto scorta</div>
+            <div class="stat-value stat-danger" id="stat-scorta">—</div>
+            <div class="stat-sub">da riordinare</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Movimenti</div>
+            <div class="stat-value stat-accent" id="stat-mov">—</div>
+            <div class="stat-sub">totali registrati</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Liste esperienza</div>
+            <div class="stat-value" id="stat-esp">—</div>
+            <div class="stat-sub">attive</div>
+          </div>
         </div>
 
-        <!-- Stats -->
-        <div class="stats-bar" id="statsBar">
-            <div class="stat-card">
-                <div class="stat-label">Componenti totali</div>
-                <div class="stat-value accent" id="statTotali">—</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-label">Sotto scorta</div>
-                <div class="stat-value danger" id="statScorta">—</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-label">Famiglie</div>
-                <div class="stat-value" id="statFamiglie">—</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-label">Movimenti oggi</div>
-                <div class="stat-value warn" id="statMovimenti">—</div>
-            </div>
+        <div class="table-header">
+          <div class="table-title">Componenti sotto scorta</div>
         </div>
-
-        <!-- Componenti recenti -->
-        <div class="page-header" style="margin-bottom:1rem">
-            <div class="page-title" style="font-size:1.1rem">Ultimi componenti aggiunti</div>
-            <a href="Componenti.html" class="btn btn-ghost btn-sm">Vedi tutti →</a>
+        <div class="table-wrap">
+          <div class="loader" id="dash-loader">
+            <div class="spinner"></div><br>Caricamento…
+          </div>
+          <table id="dash-table" style="display:none">
+            <thead><tr>
+              <th>Nome</th><th>Famiglia</th><th>Quantità</th><th>Minimo</th><th>Stato</th>
+            </tr></thead>
+            <tbody id="dash-tbody"></tbody>
+          </table>
         </div>
+      </div>
 
-        <div id="componentList">
-            <div class="loading-wrap"><div class="spinner"></div></div>
+      <!-- COMPONENTI -->
+      <div class="view" id="view-componenti">
+        <div class="table-header">
+          <div class="table-title">Componenti</div>
+          <button class="btn btn-primary" onclick="openModal('addComp')">+ Aggiungi</button>
         </div>
+        <div class="table-wrap">
+          <div class="loader" id="comp-loader"><div class="spinner"></div><br>Caricamento…</div>
+          <table id="comp-table" style="display:none">
+            <thead><tr>
+              <th>Nome</th><th>Famiglia</th><th>Locazione</th><th>Quantità</th><th>Datasheet</th><th>Stato</th>
+            </tr></thead>
+            <tbody id="comp-tbody"></tbody>
+          </table>
+        </div>
+      </div>
 
-    </main>
-</div>
+      <!-- MOVIMENTI -->
+      <div class="view" id="view-magazzino">
+        <div class="table-header">
+          <div class="table-title">Movimenti magazzino</div>
+          <button class="btn btn-primary" onclick="openModal('addMov')">+ Registra</button>
+        </div>
+        <div class="table-wrap">
+          <div class="loader" id="mov-loader"><div class="spinner"></div><br>Caricamento…</div>
+          <table id="mov-table" style="display:none">
+            <thead><tr>
+              <th>Data</th><th>Componente</th><th>Tipo</th><th>Quantità</th><th>Note</th>
+            </tr></thead>
+            <tbody id="mov-tbody"></tbody>
+          </table>
+        </div>
+      </div>
 
-<div id="toast"></div>
+      <!-- ESPERIENZE -->
+      <div class="view" id="view-esperienze">
+        <div class="table-header">
+          <div class="table-title">Liste Esperienze</div>
+        </div>
+        <div class="table-wrap">
+          <div class="loader" id="esp-loader"><div class="spinner"></div><br>Caricamento…</div>
+          <table id="esp-table" style="display:none">
+            <thead><tr><th>Nome</th><th>Creata il</th></tr></thead>
+            <tbody id="esp-tbody"></tbody>
+          </table>
+        </div>
+      </div>
 
-<script src="api.js"></script>
-<script>
-    requireAuth();
+      <!-- ACQUISTI -->
+      <div class="view" id="view-acquisti">
+        <div class="table-header">
+          <div class="table-title">Liste Acquisti</div>
+        </div>
+        <div class="table-wrap">
+          <div class="loader" id="acq-loader"><div class="spinner"></div><br>Caricamento…</div>
+          <table id="acq-table" style="display:none">
+            <thead><tr><th>ID</th><th>Creata il</th><th>Creata da</th></tr></thead>
+            <tbody id="acq-tbody"></tbody>
+          </table>
+        </div>
+      </div>
 
-    const user = getUser();
+      <!-- UTENTI (admin) -->
+      <div class="view" id="view-utenti">
+        <div class="table-header">
+          <div class="table-title">Gestione Utenti</div>
+        </div>
+        <div class="table-wrap">
+          <div class="loader" id="ute-loader"><div class="spinner"></div><br>Caricamento…</div>
+          <table id="ute-table" style="display:none">
+            <thead><tr><th>Username</th><th>Email</th><th>Ruolo</th><th>Approvato</th><th>Azione</th></tr></thead>
+            <tbody id="ute-tbody"></tbody>
+          </table>
+        </div>
+      </div>
 
-    // Mostra utente in header
-    if (user) {
-        const ruoloClass = { admin: 'badge-admin', tecnico: 'badge-tecnico', professore: 'badge-prof' };
-        document.getElementById('headerUser').innerHTML =
-            `${user.username || ''} <span class="badge ${ruoloClass[user.ruolo] || ''}">${user.ruolo || ''}</span>`;
+    </div><!-- /content -->
+  </div><!-- /main -->
 
-        if (['admin', 'tecnico'].includes(user.ruolo)) {
-            document.getElementById('adminSection').style.display = 'block';
-        }
+  <!-- ── MODAL AGGIUNGI COMPONENTE ── -->
+  <div class="overlay" id="modal-addComp">
+    <div class="modal">
+      <h3>Nuovo Componente</h3>
+      <div class="field"><label>Nome</label><input id="c-nome" placeholder="es. Resistenza 10kΩ"></div>
+      <div class="field"><label>Quantità</label><input id="c-qty" type="number" value="0" min="0"></div>
+      <div class="field"><label>Quantità minima</label><input id="c-qtymin" type="number" value="0" min="0"></div>
+      <div class="field"><label>Link datasheet</label><input id="c-ds" type="url" placeholder="https://…"></div>
+      <div class="modal-actions">
+        <button class="btn btn-primary" onclick="salvaComponente()">Salva</button>
+        <button class="btn btn-ghost" onclick="closeModal('addComp')">Annulla</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── MODAL REGISTRA MOVIMENTO ── -->
+  <div class="overlay" id="modal-addMov">
+    <div class="modal">
+      <h3>Registra Movimento</h3>
+      <div class="field">
+        <label>Componente</label>
+        <select id="m-comp"></select>
+      </div>
+      <div class="field">
+        <label>Tipo</label>
+        <select id="m-tipo">
+          <option value="carico">Carico</option>
+          <option value="scarico">Scarico</option>
+        </select>
+      </div>
+      <div class="field"><label>Quantità</label><input id="m-qty" type="number" value="1" min="1"></div>
+      <div class="field"><label>Note</label><input id="m-note" placeholder="opzionale"></div>
+      <div class="modal-actions">
+        <button class="btn btn-primary" onclick="salvaMovimento()">Salva</button>
+        <button class="btn btn-ghost" onclick="closeModal('addMov')">Annulla</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const API = 'http://localhost:8000/api';
+    let currentView = 'dashboard';
+    let allComponents = [];
+
+    /* ── AUTH ── */
+    function authHeaders() {
+      const token = localStorage.getItem('access');
+      if (!token) { window.location.href = 'LogIn.html'; return {}; }
+      return { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' };
     }
 
+    async function apiFetch(url, opts = {}) {
+      opts.headers = { ...authHeaders(), ...(opts.headers || {}) };
+      const res = await fetch(url, opts);
+      if (res.status === 401) { window.location.href = 'LogIn.html'; }
+      return res;
+    }
+
+    function logout() {
+      localStorage.removeItem('access');
+      localStorage.removeItem('refresh');
+      window.location.href = 'LogIn.html';
+    }
+
+    /* ── NAV ── */
+    function showView(view) {
+      document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+      document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+
+      document.getElementById('view-' + view).classList.add('active');
+      document.querySelectorAll('.nav-link').forEach(l => {
+        if (l.getAttribute('onclick') && l.getAttribute('onclick').includes(`'${view}'`)) {
+          l.classList.add('active');
+        }
+      });
+
+      const titles = {
+        dashboard: 'Dashboard', componenti: 'Componenti',
+        magazzino: 'Movimenti', esperienze: 'Esperienze',
+        acquisti: 'Acquisti', utenti: 'Utenti'
+      };
+      document.getElementById('pageTitle').textContent = titles[view] || view;
+      document.getElementById('searchInput').style.display = view === 'componenti' ? '' : 'none';
+
+      currentView = view;
+      loadView(view);
+    }
+
+    async function loadView(view) {
+      if (view === 'dashboard')    loadDashboard();
+      if (view === 'componenti')   loadComponenti();
+      if (view === 'magazzino')    loadMovimenti();
+      if (view === 'esperienze')   loadEsperienze();
+      if (view === 'acquisti')     loadAcquisti();
+      if (view === 'utenti')       loadUtenti();
+    }
+
+    /* ── PROFILE ── */
+    async function loadProfile() {
+      try {
+        const res = await apiFetch(`${API}/auth/profilo/`);
+        if (!res.ok) return;
+        const u = await res.json();
+        document.getElementById('userName').textContent = u.username;
+        document.getElementById('userRole').textContent = u.ruolo;
+        document.getElementById('userAvatar').textContent = u.username[0].toUpperCase();
+
+        if (['admin','tecnico'].includes(u.ruolo)) {
+          document.getElementById('adminSection').style.display = '';
+          document.querySelectorAll('.admin-only').forEach(el => el.style.display = '');
+        }
+      } catch {}
+    }
+
+    /* ── DASHBOARD ── */
     async function loadDashboard() {
-        try {
-            const [componenti, famiglie, movimenti] = await Promise.all([
-                api('/api/componenti/'),
-                api('/api/famiglie/'),
-                api('/api/movimenti/'),
-            ]);
+      try {
+        const [comps, movs, esps] = await Promise.all([
+          apiFetch(`${API}/componenti/`).then(r => r.json()),
+          apiFetch(`${API}/movimenti/`).then(r => r.json()),
+          apiFetch(`${API}/esperienze/`).then(r => r.json()),
+        ]);
 
-            // Stats
-            const sottoScorta = componenti.filter(c => c.quantita <= c.quantita_minima).length;
-            const oggi = new Date().toISOString().split('T')[0];
-            const movOggi = movimenti.filter(m => m.timestamp?.startsWith(oggi)).length;
+        const sottoScorta = comps.filter(c => c.quantita <= c.quantita_minima);
 
-            document.getElementById('statTotali').textContent   = componenti.length;
-            document.getElementById('statScorta').textContent   = sottoScorta;
-            document.getElementById('statFamiglie').textContent = famiglie.length;
-            document.getElementById('statMovimenti').textContent = movOggi;
+        document.getElementById('stat-comp').textContent = comps.length;
+        document.getElementById('stat-scorta').textContent = sottoScorta.length;
+        document.getElementById('stat-mov').textContent = movs.length;
+        document.getElementById('stat-esp').textContent = esps.length;
 
-            // Ultimi 6 componenti
-            const ultimi = [...componenti].slice(-6).reverse();
-            renderComponenti(ultimi);
+        const tbody = document.getElementById('dash-tbody');
+        tbody.innerHTML = sottoScorta.length === 0
+          ? '<tr><td colspan="5" style="text-align:center;color:var(--muted);padding:24px">✓ Nessun componente sotto scorta</td></tr>'
+          : sottoScorta.map(c => `
+            <tr>
+              <td>${c.nome}</td>
+              <td>${c.famiglia || '—'}</td>
+              <td>${c.quantita}</td>
+              <td>${c.quantita_minima}</td>
+              <td><span class="badge badge-warn">Sotto scorta</span></td>
+            </tr>`).join('');
 
-        } catch (e) {
-            document.getElementById('componentList').innerHTML =
-                `<div class="empty-state"><p>Errore nel caricamento dati.</p></div>`;
-        }
+        document.getElementById('dash-loader').style.display = 'none';
+        document.getElementById('dash-table').style.display = '';
+      } catch (e) {
+        document.getElementById('dash-loader').innerHTML = '⚠️ Errore nel caricamento dati.';
+      }
     }
 
-    function renderComponenti(lista) {
-        const el = document.getElementById('componentList');
-        if (!lista.length) {
-            el.innerHTML = `<div class="empty-state"><p>Nessun componente trovato.</p></div>`;
-            return;
-        }
-
-        el.innerHTML = `<div class="cards-grid">${lista.map(c => {
-            const pct = c.quantita_minima > 0 ? c.quantita / c.quantita_minima : Infinity;
-            const statusClass = pct <= 1 ? 'qty-low' : pct <= 1.5 ? 'qty-warn' : 'qty-ok';
-            const statusText  = pct <= 1 ? '⚠ scorta' : pct <= 1.5 ? '~ attenzione' : '✓ ok';
-
-            return `
-            <div class="card" onclick="window.location.href='Product.html?id=${c.id}'">
-                <div class="card-code">#${c.id}</div>
-                <div class="card-title">${c.nome}</div>
-                <div class="qty-bar">
-                    <div>
-                        <div class="qty-num">${c.quantita}</div>
-                        <div class="qty-label">pz in magazzino</div>
-                    </div>
-                    <div class="qty-status ${statusClass}">${statusText}</div>
-                </div>
-            </div>`;
-        }).join('')}</div>`;
+    /* ── COMPONENTI ── */
+    async function loadComponenti() {
+      document.getElementById('comp-loader').style.display = 'block';
+      document.getElementById('comp-table').style.display = 'none';
+      try {
+        const res = await apiFetch(`${API}/componenti/`);
+        allComponents = await res.json();
+        renderComponenti(allComponents);
+      } catch {
+        document.getElementById('comp-loader').innerHTML = '⚠️ Errore nel caricamento.';
+      }
     }
 
-    function showToast(msg, type = '') {
-        const t = document.getElementById('toast');
-        t.textContent = msg;
-        t.className = `show ${type}`;
-        setTimeout(() => t.className = '', 3000);
+    function renderComponenti(comps) {
+      const tbody = document.getElementById('comp-tbody');
+      tbody.innerHTML = comps.length === 0
+        ? '<tr><td colspan="6" style="text-align:center;color:var(--muted);padding:24px">Nessun componente trovato</td></tr>'
+        : comps.map(c => `
+          <tr>
+            <td><strong>${c.nome}</strong></td>
+            <td>${c.famiglia ?? '—'}</td>
+            <td>${c.locazione ?? '—'}</td>
+            <td>${c.quantita}</td>
+            <td>${c.link_datasheet ? `<a href="${c.link_datasheet}" target="_blank" style="color:var(--accent)">↗ Apri</a>` : '—'}</td>
+            <td><span class="badge ${c.quantita <= c.quantita_minima ? 'badge-warn' : 'badge-ok'}">
+              ${c.quantita <= c.quantita_minima ? 'Sotto scorta' : 'OK'}
+            </span></td>
+          </tr>`).join('');
+      document.getElementById('comp-loader').style.display = 'none';
+      document.getElementById('comp-table').style.display = '';
     }
 
-    loadDashboard();
-</script>
+    function filterTable() {
+      const q = document.getElementById('searchInput').value.toLowerCase();
+      const filtered = allComponents.filter(c =>
+        c.nome.toLowerCase().includes(q)
+      );
+      renderComponenti(filtered);
+    }
 
+    /* ── MOVIMENTI ── */
+    async function loadMovimenti() {
+      document.getElementById('mov-loader').style.display = 'block';
+      document.getElementById('mov-table').style.display = 'none';
+      try {
+        const res = await apiFetch(`${API}/movimenti/`);
+        const movs = await res.json();
+        const tbody = document.getElementById('mov-tbody');
+        tbody.innerHTML = movs.length === 0
+          ? '<tr><td colspan="5" style="text-align:center;color:var(--muted);padding:24px">Nessun movimento registrato</td></tr>'
+          : movs.slice().reverse().map(m => `
+            <tr>
+              <td>${new Date(m.timestamp).toLocaleString('it-IT')}</td>
+              <td>${m.componente}</td>
+              <td><span class="badge ${m.tipo === 'carico' ? 'badge-ok' : 'badge-warn'}">
+                ${m.tipo === 'carico' ? '↑ Carico' : '↓ Scarico'}
+              </span></td>
+              <td>${m.quantita}</td>
+              <td>${m.note || '—'}</td>
+            </tr>`).join('');
+        document.getElementById('mov-loader').style.display = 'none';
+        document.getElementById('mov-table').style.display = '';
+      } catch {
+        document.getElementById('mov-loader').innerHTML = '⚠️ Errore nel caricamento.';
+      }
+    }
+
+    /* ── ESPERIENZE ── */
+    async function loadEsperienze() {
+      document.getElementById('esp-loader').style.display = 'block';
+      document.getElementById('esp-table').style.display = 'none';
+      try {
+        const res = await apiFetch(`${API}/esperienze/`);
+        const list = await res.json();
+        document.getElementById('esp-tbody').innerHTML = list.map(e => `
+          <tr>
+            <td>${e.nome}</td>
+            <td>${new Date(e.creata_il).toLocaleDateString('it-IT')}</td>
+          </tr>`).join('') || '<tr><td colspan="2" style="text-align:center;color:var(--muted);padding:24px">Nessuna lista</td></tr>';
+        document.getElementById('esp-loader').style.display = 'none';
+        document.getElementById('esp-table').style.display = '';
+      } catch {
+        document.getElementById('esp-loader').innerHTML = '⚠️ Errore.';
+      }
+    }
+
+    /* ── ACQUISTI ── */
+    async function loadAcquisti() {
+      document.getElementById('acq-loader').style.display = 'block';
+      document.getElementById('acq-table').style.display = 'none';
+      try {
+        const res = await apiFetch(`${API}/acquisti/`);
+        const list = await res.json();
+        document.getElementById('acq-tbody').innerHTML = list.map(a => `
+          <tr>
+            <td>#${a.id}</td>
+            <td>${new Date(a.creata_il).toLocaleDateString('it-IT')}</td>
+            <td>${a.creata_da ?? '—'}</td>
+          </tr>`).join('') || '<tr><td colspan="3" style="text-align:center;color:var(--muted);padding:24px">Nessuna lista</td></tr>';
+        document.getElementById('acq-loader').style.display = 'none';
+        document.getElementById('acq-table').style.display = '';
+      } catch {
+        document.getElementById('acq-loader').innerHTML = '⚠️ Errore.';
+      }
+    }
+
+    /* ── UTENTI ── */
+    async function loadUtenti() {
+      document.getElementById('ute-loader').style.display = 'block';
+      document.getElementById('ute-table').style.display = 'none';
+      try {
+        const res = await apiFetch(`${API}/auth/utenti/`);
+        const users = await res.json();
+        document.getElementById('ute-tbody').innerHTML = users.map(u => `
+          <tr>
+            <td>${u.username}</td>
+            <td>${u.email}</td>
+            <td>${u.ruolo}</td>
+            <td><span class="badge ${u.approvato ? 'badge-ok' : 'badge-warn'}">${u.approvato ? '✓ Sì' : '✗ No'}</span></td>
+            <td>${!u.approvato
+              ? `<button class="btn btn-primary" style="padding:5px 12px;font-size:0.78rem" onclick="approvaUtente(${u.id})">Approva</button>`
+              : '—'}</td>
+          </tr>`).join('');
+        document.getElementById('ute-loader').style.display = 'none';
+        document.getElementById('ute-table').style.display = '';
+      } catch {
+        document.getElementById('ute-loader').innerHTML = '⚠️ Errore.';
+      }
+    }
+
+    async function approvaUtente(id) {
+      await apiFetch(`${API}/auth/utenti/${id}/approva/`, { method: 'POST' });
+      loadUtenti();
+    }
+
+    /* ── MODALS ── */
+    function openModal(name) {
+      document.getElementById('modal-' + name).classList.add('open');
+      if (name === 'addMov') populateCompSelect();
+    }
+
+    function closeModal(name) {
+      document.getElementById('modal-' + name).classList.remove('open');
+    }
+
+    async function populateCompSelect() {
+      const sel = document.getElementById('m-comp');
+      if (!allComponents.length) {
+        const res = await apiFetch(`${API}/componenti/`);
+        allComponents = await res.json();
+      }
+      sel.innerHTML = allComponents.map(c => `<option value="${c.id}">${c.nome}</option>`).join('');
+    }
+
+    async function salvaComponente() {
+      const body = {
+        nome: document.getElementById('c-nome').value,
+        quantita: parseInt(document.getElementById('c-qty').value),
+        quantita_minima: parseInt(document.getElementById('c-qtymin').value),
+        link_datasheet: document.getElementById('c-ds').value,
+      };
+      await apiFetch(`${API}/componenti/`, { method: 'POST', body: JSON.stringify(body) });
+      closeModal('addComp');
+      loadComponenti();
+    }
+
+    async function salvaMovimento() {
+      const body = {
+        componente: document.getElementById('m-comp').value,
+        tipo: document.getElementById('m-tipo').value,
+        quantita: parseInt(document.getElementById('m-qty').value),
+        note: document.getElementById('m-note').value,
+      };
+      await apiFetch(`${API}/movimenti/`, { method: 'POST', body: JSON.stringify(body) });
+      closeModal('addMov');
+      loadMovimenti();
+    }
+
+    // Close modal on overlay click
+    document.querySelectorAll('.overlay').forEach(o => {
+      o.addEventListener('click', e => { if (e.target === o) o.classList.remove('open'); });
+    });
+
+    /* ── INIT ── */
+    (async () => {
+      await loadProfile();
+      loadDashboard();
+      document.getElementById('searchInput').style.display = 'none';
+    })();
+  </script>
 </body>
 </html>
