@@ -1,6 +1,6 @@
 from django.db import models
-from BackEnd.utenti.models import Utente
-from BackEnd.componenti.models import Componente
+from utenti.models import Utente
+from componenti.models import Componente
 
 class ListaEsperienza(models.Model):
     nome = models.CharField(max_length=200)
