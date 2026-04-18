@@ -1,26 +1,299 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="it">
 <head>
     <meta charset="UTF-8">
-    <title>Prodotto</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prodotto — Magazzino Fermi</title>
+    <link rel="stylesheet" href="styles.css">
 </head>
-<body>
-<input type="checkbox" id="menu-toggle">
-  <nav class="sidebar">
-    <label for="menu-toggle" class="toggle-btn">
-      <svg class="arrow" viewBox="0 0 24 24"><path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z"/></svg>
-    </label>
-<label style="color: white; position: absolute; text-align:center; margin-left:70px; font-size:35px; margin-top:10px">Menù</label>
+<body class="app-page">
 
-<form style="margin-top: 85px; margin-left: 10px"><!--action="/action_page.php"-->
-  <input type="checkbox" id="vehicle1" name="vehicle1" value="Bike" class="checkbox">
-  <label for="vehicle1" class="window-text"> I have a bike </label ><br>
-  <input type="checkbox" id="vehicle2" name="vehicle2" value="Car" class="checkbox">
-  <label for="vehicle2" class="window-text"> I have a car</label><br>
-  <input type="checkbox" id="vehicle3" name="vehicle3" value="Boat" class="checkbox">
-  <label for="vehicle3" class="window-text"> I have a boat</label><br><br>
-  <input type="submit" value="Submit" style="margin-left: -5px">
-</form>
-</nav>
+<!-- Header -->
+<header class="app-header">
+    <div class="header-logo">MagazzinoFermi</div>
+    <div class="header-sep"></div>
+    <span class="header-user" id="headerUser"></span>
+    <button class="btn btn-ghost btn-sm" onclick="logout()">Esci</button>
+</header>
+
+<div class="app-body">
+
+    <!-- Sidebar -->
+    <nav class="sidebar">
+        <div class="sidebar-section">
+            <div class="sidebar-label">Navigazione</div>
+            <a href="Home.html">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+                Dashboard
+            </a>
+            <a href="Componenti.html" class="active">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+                Componenti
+            </a>
+            <a href="Movimenti.html">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
+                Movimenti
+            </a>
+        </div>
+        <div class="sidebar-section" id="adminSection" style="display:none">
+            <div class="sidebar-label">Gestione</div>
+            <a href="Utenti.html">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+                Utenti
+            </a>
+            <a href="Liste.html">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/></svg>
+                Liste
+            </a>
+        </div>
+    </nav>
+
+    <!-- Main -->
+    <main class="app-main">
+
+        <div class="page-header">
+            <div>
+                <button class="btn btn-ghost btn-sm" onclick="history.back()" style="margin-bottom:0.75rem">← Indietro</button>
+                <div class="page-title" id="pageTitle">Caricamento...</div>
+                <div class="page-subtitle" id="pageSubtitle"></div>
+            </div>
+            <div id="actionBtns" style="display:flex; gap:0.5rem; display:none"></div>
+        </div>
+
+        <div id="productContent">
+            <div class="loading-wrap"><div class="spinner"></div></div>
+        </div>
+
+    </main>
+</div>
+
+<!-- Modal movimento -->
+<div class="modal-overlay" id="movimentoModal">
+    <div class="modal">
+        <div class="modal-header">
+            <div class="modal-title" id="modalTitle">Registra movimento</div>
+            <button class="modal-close" onclick="closeModal()">✕</button>
+        </div>
+
+        <div class="form-group">
+            <label>Tipo</label>
+            <select id="movTipo">
+                <option value="carico">Carico (entrata)</option>
+                <option value="scarico">Scarico (uscita)</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label>Quantità</label>
+            <input type="number" id="movQty" min="1" value="1">
+        </div>
+        <div class="form-group">
+            <label>Note (opzionale)</label>
+            <input type="text" id="movNote" placeholder="es. per laboratorio 3A">
+        </div>
+
+        <div class="error-msg" id="movError"></div>
+
+        <button class="btn btn-primary" onclick="salvaMovimento()">Conferma</button>
+    </div>
+</div>
+
+<div id="toast"></div>
+
+<script src="api.js"></script>
+<script>
+    requireAuth();
+
+    const params = new URLSearchParams(window.location.search);
+    const componenteId = params.get('id');
+    let componenteData = null;
+
+    const user = getUser();
+    const canWrite = user && ['admin', 'tecnico'].includes(user.ruolo);
+
+    if (user) {
+        const ruoloClass = { admin: 'badge-admin', tecnico: 'badge-tecnico', professore: 'badge-prof' };
+        document.getElementById('headerUser').innerHTML =
+            `${user.username || ''} <span class="badge ${ruoloClass[user.ruolo] || ''}">${user.ruolo || ''}</span>`;
+        if (canWrite) document.getElementById('adminSection').style.display = 'block';
+    }
+
+    if (!componenteId) {
+        document.getElementById('pageTitle').textContent = 'Componente non trovato';
+        document.getElementById('productContent').innerHTML =
+            `<div class="empty-state"><p>ID componente mancante nell'URL.</p></div>`;
+    } else {
+        loadComponente();
+    }
+
+    async function loadComponente() {
+        try {
+            const [comp, movimenti] = await Promise.all([
+                api(`/api/componenti/${componenteId}/`),
+                api(`/api/movimenti/?componente=${componenteId}`),
+            ]);
+
+            componenteData = comp;
+            renderComponente(comp, movimenti);
+
+        } catch (e) {
+            document.getElementById('pageTitle').textContent = 'Errore';
+            document.getElementById('productContent').innerHTML =
+                `<div class="empty-state"><p>Componente non trovato o accesso negato.</p></div>`;
+        }
+    }
+
+    function renderComponente(c, movimenti) {
+        document.getElementById('pageTitle').textContent = c.nome;
+        document.getElementById('pageSubtitle').textContent = `ID #${c.id}`;
+
+        // Bottoni azione (solo admin/tecnico)
+        if (canWrite) {
+            const btns = document.getElementById('actionBtns');
+            btns.style.display = 'flex';
+            btns.innerHTML = `
+                <button class="btn btn-ghost btn-sm" onclick="openModal()">+ Movimento</button>
+                <button class="btn btn-ghost btn-sm" onclick="eliminaComponente()">🗑 Elimina</button>
+            `;
+        }
+
+        const pct = c.quantita_minima > 0 ? c.quantita / c.quantita_minima : Infinity;
+        const statusClass = pct <= 1 ? 'qty-low' : pct <= 1.5 ? 'qty-warn' : 'qty-ok';
+        const statusText  = pct <= 1 ? 'Sotto scorta' : pct <= 1.5 ? 'Attenzione' : 'Disponibile';
+
+        document.getElementById('productContent').innerHTML = `
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:1rem; margin-bottom:2rem">
+
+                <div class="stat-card">
+                    <div class="stat-label">Quantità attuale</div>
+                    <div class="stat-value ${statusClass}" style="font-size:3rem">${c.quantita}</div>
+                    <div style="margin-top:0.5rem; font-size:0.8rem; color:var(--text2)">
+                        Minimo: ${c.quantita_minima} pz &nbsp;·&nbsp;
+                        <span class="${statusClass}">${statusText}</span>
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-label">Dettagli</div>
+                    <table style="width:100%; margin-top:0.5rem">
+                        <tr><td style="color:var(--text2);font-size:0.8rem;padding:0.3rem 0">Locazione</td>
+                            <td class="mono" style="text-align:right">${c.locazione ?? '—'}</td></tr>
+                        <tr><td style="color:var(--text2);font-size:0.8rem;padding:0.3rem 0">Famiglia</td>
+                            <td class="mono" style="text-align:right">${c.famiglia ?? '—'}</td></tr>
+                        <tr><td style="color:var(--text2);font-size:0.8rem;padding:0.3rem 0">Scorta?</td>
+                            <td class="mono" style="text-align:right">${c.is_scorta ? 'Sì' : 'No'}</td></tr>
+                        ${c.link_datasheet ? `<tr><td style="color:var(--text2);font-size:0.8rem;padding:0.3rem 0">Datasheet</td>
+                            <td style="text-align:right"><a href="${c.link_datasheet}" target="_blank" style="font-size:0.8rem">Apri →</a></td></tr>` : ''}
+                    </table>
+                </div>
+            </div>
+
+            <!-- Storico movimenti -->
+            <div class="page-header" style="margin-bottom:1rem">
+                <div class="page-title" style="font-size:1.1rem">Storico movimenti</div>
+            </div>
+
+            ${movimenti.length === 0
+                ? `<div class="empty-state"><p>Nessun movimento registrato per questo componente.</p></div>`
+                : `<div class="table-wrap">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Data</th>
+                                <th>Tipo</th>
+                                <th>Quantità</th>
+                                <th>Utente</th>
+                                <th>Note</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${movimenti.map(m => `
+                            <tr>
+                                <td class="mono">${new Date(m.timestamp).toLocaleString('it-IT')}</td>
+                                <td>
+                                    <span class="badge ${m.tipo === 'carico' ? 'badge-tecnico' : 'badge-prof'}">
+                                        ${m.tipo}
+                                    </span>
+                                </td>
+                                <td class="mono">${m.tipo === 'carico' ? '+' : '-'}${m.quantita}</td>
+                                <td class="mono">${m.utente ?? '—'}</td>
+                                <td style="color:var(--text2);font-size:0.82rem">${m.note || '—'}</td>
+                            </tr>`).join('')}
+                        </tbody>
+                    </table>
+                </div>`
+            }
+        `;
+    }
+
+    function openModal() {
+        document.getElementById('movimentoModal').classList.add('open');
+        document.getElementById('movError').classList.remove('visible');
+        document.getElementById('movQty').value = 1;
+        document.getElementById('movNote').value = '';
+    }
+
+    function closeModal() {
+        document.getElementById('movimentoModal').classList.remove('open');
+    }
+
+    async function salvaMovimento() {
+        const tipo = document.getElementById('movTipo').value;
+        const qty  = parseInt(document.getElementById('movQty').value);
+        const note = document.getElementById('movNote').value;
+        const err  = document.getElementById('movError');
+
+        err.classList.remove('visible');
+
+        if (!qty || qty < 1) {
+            err.textContent = 'Inserisci una quantità valida.';
+            err.classList.add('visible');
+            return;
+        }
+
+        try {
+            await api('/api/movimenti/', {
+                method: 'POST',
+                body: JSON.stringify({
+                    componente: componenteId,
+                    tipo,
+                    quantita: qty,
+                    note
+                })
+            });
+
+            closeModal();
+            showToast('Movimento registrato!', 'ok');
+            loadComponente(); // ricarica
+        } catch (e) {
+            err.textContent = 'Errore durante il salvataggio.';
+            err.classList.add('visible');
+        }
+    }
+
+    async function eliminaComponente() {
+        if (!confirm(`Eliminare il componente "${componenteData?.nome}"? L'operazione è irreversibile.`)) return;
+
+        try {
+            await api(`/api/componenti/${componenteId}/`, { method: 'DELETE' });
+            showToast('Componente eliminato.', 'ok');
+            setTimeout(() => window.location.href = 'Componenti.html', 1200);
+        } catch {
+            showToast('Errore durante l\'eliminazione.', 'err');
+        }
+    }
+
+    function showToast(msg, type = '') {
+        const t = document.getElementById('toast');
+        t.textContent = msg;
+        t.className = `show ${type}`;
+        setTimeout(() => t.className = '', 3000);
+    }
+
+    // Chiudi modal cliccando fuori
+    document.getElementById('movimentoModal').addEventListener('click', function(e) {
+        if (e.target === this) closeModal();
+    });
+</script>
+
 </body>
 </html>

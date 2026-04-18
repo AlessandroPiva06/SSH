@@ -1,16 +1,21 @@
 from rest_framework import viewsets, permissions
+from django.shortcuts import render
 from .models import Componente, Famiglia, Tag, Locazione
 from .serializers import ComponenteSerializer, FamigliaSerializer, TagSerializer, LocazioneSerializer
+
+
+# ─── Permessi ───────────────────────────────────────────────────────────────
 
 class PermessoPerRuolo(permissions.BasePermission):
     def has_permission(self, request, view):
         if not request.user.is_authenticated:
             return False
-        # Tutti i loggati approvati possono leggere
         if request.method in permissions.SAFE_METHODS:
             return request.user.approvato
-        # Solo admin e tecnico possono scrivere
         return request.user.ruolo in ['admin', 'tecnico']
+
+
+# ─── API ViewSet ─────────────────────────────────────────────────────────────
 
 class FamigliaViewSet(viewsets.ModelViewSet):
     queryset = Famiglia.objects.all()
@@ -31,3 +36,11 @@ class ComponenteViewSet(viewsets.ModelViewSet):
     queryset = Componente.objects.all()
     serializer_class = ComponenteSerializer
     permission_classes = [PermessoPerRuolo]
+
+
+# ─── Template Views ──────────────────────────────────────────────────────────
+
+def product_page(request):
+    """Renderizza la pagina prodotto iniettando i tag dal database."""
+    tags = Tag.objects.all()
+    return render(request, 'product.html', {'tags': tags})
