@@ -1,3 +1,3 @@
 la droga da la droga daje
 
-NON USARE setup.sh SERVE SOLO A RESETTARE IL DB
+NON USARE reset_db.sh SERVE SOLO A RESETTARE IL DB
