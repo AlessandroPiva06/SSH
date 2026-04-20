@@ -1,3 +1,3 @@
 la droga da la droga daje
-fausto
-password
+
+NON USARE setup.sh SERVE SOLO A RESETTARE IL DB
