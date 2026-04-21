@@ -16,27 +16,28 @@ sudo mysql -e "ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_passwo
 # Crea database
 sudo mysql -u root -ppassword -e "CREATE DATABASE IF NOT EXISTS magazzino_fermi CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;"
 
-# Crea venv
-cd ~/PyCharmMiscProject/SSH
-python3 -m venv venv
-source venv/bin/activate
+# Vai nella root del progetto
+cd ~/PycharmProjects/SSH
 
-# Installa librerie Python
-pip install --upgrade pip
+# Ricrea venv pulito con --copies (evita problemi di symlink su Ubuntu/Debian)
+rm -rf venv
+python3 -m venv venv --copies
 
-pip install \
+# Installa librerie Python usando il pip del venv direttamente
+venv/bin/pip install --upgrade pip
+
+venv/bin/pip install \
     django \
     djangorestframework \
     djangorestframework-simplejwt \
     django-cors-headers \
-    django-channels \
     channels \
     mysqlclient \
     python-decouple \
-    Pillow \
-    django-filter
+    django-filter \
+    Pillow
 
-# Copia .env di esempio se non esiste
+# Crea .env se non esiste
 if [ ! -f BackEnd/.env ]; then
     echo "SECRET_KEY=cambia-questa-chiave-segreta" > BackEnd/.env
     echo "DB_NAME=magazzino_fermi" >> BackEnd/.env
@@ -48,10 +49,13 @@ if [ ! -f BackEnd/.env ]; then
 fi
 
 # Migrate
-cd BackEnd
-python3 manage.py migrate
+venv/bin/python3 BackEnd/manage.py migrate
 
 echo ""
 echo "=== Setup completato! ==="
-echo "Ora lancia: python3 BackEnd/manage.py createsuperuser"
-echo "Poi avvia il server con: python3 BackEnd/manage.py runserver"
+echo ""
+echo "Per avviare il server:"
+echo "  venv/bin/python3 BackEnd/manage.py runserver"
+echo ""
+echo "Per creare il superuser:"
+echo "  venv/bin/python3 BackEnd/manage.py createsuperuser"
