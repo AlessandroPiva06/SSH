@@ -33,7 +33,8 @@ pip install \
     channels \
     mysqlclient \
     python-decouple \
-    Pillow
+    Pillow \
+    django-filter
 
 # Copia .env di esempio se non esiste
 if [ ! -f BackEnd/.env ]; then
