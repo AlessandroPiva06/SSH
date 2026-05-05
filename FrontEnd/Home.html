@@ -146,7 +146,7 @@
       display: flex;
       align-items: center;
       padding: 0 28px;
-      gap: 16px;
+      gap: 10px;
       position: sticky;
       top: 0;
       background: var(--bg);
@@ -169,7 +169,7 @@
       font-family: 'DM Sans', sans-serif;
       font-size: 0.88rem;
       padding: 8px 12px 8px 34px;
-      width: 220px;
+      width: 200px;
       transition: border-color 0.2s;
     }
 
@@ -182,6 +182,257 @@
       color: var(--muted);
       font-size: 0.85rem;
     }
+
+    /* ── FILTER BUTTON ── */
+    .filter-btn {
+      position: relative;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 14px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--muted);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.88rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.15s;
+      white-space: nowrap;
+    }
+    .filter-btn:hover { border-color: var(--accent); color: var(--accent); }
+    .filter-btn.active { border-color: var(--accent); color: var(--accent); background: rgba(232,184,109,0.08); }
+
+    .filter-badge {
+      display: none;
+      position: absolute;
+      top: -6px; right: -6px;
+      background: var(--accent);
+      color: #0f1117;
+      font-size: 0.65rem;
+      font-weight: 700;
+      width: 16px; height: 16px;
+      border-radius: 50%;
+      align-items: center;
+      justify-content: center;
+      line-height: 1;
+    }
+    .filter-badge.show { display: flex; }
+
+    /* ── FILTER POPUP ── */
+    .filter-popup-wrap {
+      position: relative;
+    }
+
+    .filter-popup {
+      display: none;
+      position: absolute;
+      top: calc(100% + 8px);
+      right: 0;
+      width: 340px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      box-shadow: 0 16px 48px rgba(0,0,0,0.5);
+      z-index: 300;
+      overflow: hidden;
+      animation: popIn 0.18s ease both;
+    }
+
+    .filter-popup.open { display: block; }
+
+    @keyframes popIn {
+      from { opacity: 0; transform: translateY(-8px) scale(0.97); }
+      to   { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    .filter-popup-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 16px 10px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .filter-popup-title {
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: var(--text);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+
+    .filter-reset {
+      font-size: 0.78rem;
+      color: var(--accent);
+      cursor: pointer;
+      background: none;
+      border: none;
+      font-family: 'DM Sans', sans-serif;
+      padding: 2px 6px;
+      border-radius: 4px;
+      transition: background 0.15s;
+    }
+    .filter-reset:hover { background: rgba(232,184,109,0.1); }
+
+    .filter-popup-body {
+      padding: 14px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      max-height: 420px;
+      overflow-y: auto;
+    }
+
+    .filter-group {}
+
+    .filter-group-label {
+      font-size: 0.72rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.09em;
+      color: var(--muted);
+      margin-bottom: 7px;
+    }
+
+    .filter-group select {
+      width: 100%;
+      padding: 8px 12px;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--text);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.88rem;
+      transition: border-color 0.2s;
+      cursor: pointer;
+    }
+    .filter-group select:focus { outline: none; border-color: var(--accent); }
+    .filter-group select option { background: var(--surface); }
+
+    /* Tag pills */
+    .tag-pills {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+
+    .tag-pill {
+      padding: 4px 10px;
+      border-radius: 20px;
+      border: 1px solid var(--border);
+      background: var(--bg);
+      color: var(--muted);
+      font-size: 0.78rem;
+      cursor: pointer;
+      transition: all 0.15s;
+      user-select: none;
+    }
+
+    .tag-pill:hover { border-color: var(--accent); color: var(--accent); }
+    .tag-pill.selected {
+      background: rgba(232,184,109,0.12);
+      border-color: var(--accent);
+      color: var(--accent);
+      font-weight: 600;
+    }
+
+    /* Scorta toggle */
+    .scorta-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 2px 0;
+    }
+    .scorta-row-label { font-size: 0.88rem; color: var(--text); }
+
+    .toggle-wrap {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .toggle-track {
+      width: 36px; height: 20px;
+      background: var(--border);
+      border-radius: 10px;
+      position: relative;
+      cursor: pointer;
+      transition: background 0.2s;
+      flex-shrink: 0;
+    }
+    .toggle-track.on { background: var(--accent); }
+    .toggle-thumb {
+      width: 14px; height: 14px;
+      background: white;
+      border-radius: 50%;
+      position: absolute;
+      top: 3px; left: 3px;
+      transition: transform 0.2s;
+    }
+    .toggle-track.on .toggle-thumb { transform: translateX(16px); }
+
+    .toggle-label { font-size: 0.8rem; color: var(--muted); width: 22px; }
+
+    .filter-popup-footer {
+      padding: 10px 16px 14px;
+      border-top: 1px solid var(--border);
+    }
+
+    .btn-apply {
+      width: 100%;
+      padding: 9px;
+      background: var(--accent);
+      color: #0f1117;
+      border: none;
+      border-radius: 8px;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.88rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+    .btn-apply:hover { background: var(--accent2); }
+
+    /* ── Active filter chips (below topbar) ── */
+    .active-filters {
+      display: none;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 6px;
+      padding: 8px 28px;
+      background: var(--bg);
+      border-bottom: 1px solid var(--border);
+    }
+    .active-filters.show { display: flex; }
+    .active-filters-label {
+      font-size: 0.75rem;
+      color: var(--muted);
+      margin-right: 2px;
+    }
+    .filter-chip {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      padding: 3px 10px;
+      background: rgba(232,184,109,0.1);
+      border: 1px solid rgba(232,184,109,0.3);
+      border-radius: 20px;
+      font-size: 0.75rem;
+      color: var(--accent);
+    }
+    .filter-chip button {
+      background: none;
+      border: none;
+      color: var(--accent);
+      cursor: pointer;
+      font-size: 0.9rem;
+      line-height: 1;
+      padding: 0;
+      opacity: 0.7;
+    }
+    .filter-chip button:hover { opacity: 1; }
 
     .content { padding: 28px; flex: 1; }
 
@@ -300,7 +551,6 @@
     .badge-warn    { background: rgba(224,92,92,0.15); color: var(--danger); }
     .badge-neutral { background: rgba(122,127,150,0.15); color: var(--muted); }
 
-    /* ── LOADING ── */
     .loader {
       text-align: center;
       padding: 48px;
@@ -392,7 +642,6 @@
       gap: 12px;
     }
 
-    /* Tag checkboxes */
     .tags-grid {
       display: flex;
       flex-wrap: wrap;
@@ -421,7 +670,6 @@
       color: var(--accent);
     }
 
-    /* Scorta toggle */
     .scorta-toggle {
       display: flex;
       align-items: center;
@@ -436,7 +684,7 @@
 
     .scorta-toggle:hover { border-color: var(--accent); }
 
-    .toggle-track {
+    .toggle-track-modal {
       width: 38px; height: 22px;
       background: var(--border);
       border-radius: 11px;
@@ -445,9 +693,9 @@
       flex-shrink: 0;
     }
 
-    .toggle-track.on { background: var(--accent); }
+    .toggle-track-modal.on { background: var(--accent); }
 
-    .toggle-thumb {
+    .toggle-thumb-modal {
       width: 16px; height: 16px;
       background: white;
       border-radius: 50%;
@@ -456,7 +704,7 @@
       transition: transform 0.2s;
     }
 
-    .toggle-track.on .toggle-thumb { transform: translateX(16px); }
+    .toggle-track-modal.on .toggle-thumb-modal { transform: translateX(16px); }
 
     .scorta-label { font-size: 0.9rem; color: var(--text); }
 
@@ -466,7 +714,6 @@
       margin-top: 24px;
     }
 
-    /* Toast */
     #toast {
       position: fixed;
       bottom: 24px; right: 24px;
@@ -484,6 +731,14 @@
     #toast.show { transform: translateY(0); opacity: 1; }
     #toast.ok   { border-color: var(--success); color: var(--success); }
     #toast.err  { border-color: var(--danger); color: var(--danger); }
+
+    /* risultati vuoti */
+    .empty-row td {
+      text-align: center;
+      color: var(--muted);
+      padding: 32px 16px;
+      font-size: 0.88rem;
+    }
   </style>
 </head>
 <body>
@@ -537,10 +792,91 @@
   <div class="main">
     <div class="topbar">
       <h1 id="pageTitle">Dashboard</h1>
-      <div class="search-wrap">
-        <span class="search-icon">🔍</span>
-        <input type="search" id="searchInput" placeholder="Cerca componenti…" oninput="filterTable()">
+
+      <!-- Search + Filter (visible only on componenti view) -->
+      <div id="compControls" style="display:none; align-items:center; gap:8px;">
+        <div class="search-wrap">
+          <span class="search-icon">🔍</span>
+          <input type="search" id="searchInput" placeholder="Cerca per nome…" oninput="applyFilters()">
+        </div>
+
+        <div class="filter-popup-wrap" id="filterWrap">
+          <button class="filter-btn" id="filterBtn" onclick="toggleFilterPopup()">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 3H2l8 9.46V19l4 2V12.46L22 3z"/></svg>
+            Filtri
+            <span class="filter-badge" id="filterBadge">0</span>
+          </button>
+
+          <!-- FILTER POPUP -->
+          <div class="filter-popup" id="filterPopup">
+            <div class="filter-popup-header">
+              <span class="filter-popup-title">Filtra componenti</span>
+              <button class="filter-reset" onclick="resetFilters()">Azzera tutto</button>
+            </div>
+
+            <div class="filter-popup-body">
+
+              <!-- Famiglia -->
+              <div class="filter-group">
+                <div class="filter-group-label">Famiglia</div>
+                <select id="f-famiglia" onchange="applyFilters()">
+                  <option value="">Tutte le famiglie</option>
+                </select>
+              </div>
+
+              <!-- Locazione -->
+              <div class="filter-group">
+                <div class="filter-group-label">Locazione</div>
+                <select id="f-locazione" onchange="applyFilters()">
+                  <option value="">Tutte le locazioni</option>
+                </select>
+              </div>
+
+              <!-- Tag -->
+              <div class="filter-group">
+                <div class="filter-group-label">Tag (seleziona uno o più)</div>
+                <div class="tag-pills" id="f-tags"></div>
+              </div>
+
+              <!-- Scorta -->
+              <div class="filter-group">
+                <div class="filter-group-label">Stato scorta</div>
+
+                <div class="scorta-row" style="margin-bottom:8px">
+                  <span class="scorta-row-label">Solo sotto scorta</span>
+                  <div class="toggle-wrap">
+                    <div class="toggle-track" id="t-sottoScorta" onclick="toggleFilter('sottoScorta')">
+                      <div class="toggle-thumb"></div>
+                    </div>
+                    <span class="toggle-label" id="l-sottoScorta">No</span>
+                  </div>
+                </div>
+
+                <div class="scorta-row">
+                  <span class="scorta-row-label">Solo articoli scorta</span>
+                  <div class="toggle-wrap">
+                    <div class="toggle-track" id="t-isScorta" onclick="toggleFilter('isScorta')">
+                      <div class="toggle-thumb"></div>
+                    </div>
+                    <span class="toggle-label" id="l-isScorta">No</span>
+                  </div>
+                </div>
+              </div>
+
+            </div>
+
+            <div class="filter-popup-footer">
+              <button class="btn-apply" onclick="closeFilterPopup()">Applica filtri</button>
+            </div>
+          </div>
+        </div>
       </div>
+    </div>
+
+    <!-- Active filter chips -->
+    <div class="active-filters" id="activeFilters">
+      <span class="active-filters-label">Filtri attivi:</span>
+      <div id="filterChips"></div>
     </div>
 
     <div class="content">
@@ -596,7 +932,7 @@
           <div class="loader" id="comp-loader"><div class="spinner"></div><br>Caricamento…</div>
           <table id="comp-table" style="display:none">
             <thead><tr>
-              <th>Nome</th><th>Famiglia</th><th>Locazione</th><th>Quantità</th><th>Stato</th><th>Datasheet</th>><th>Azioni</th>
+              <th>Nome</th><th>Famiglia</th><th>Locazione</th><th>Quantità</th><th>Stato</th><th>Datasheet</th><th>Azioni</th>
             </tr></thead>
             <tbody id="comp-tbody"></tbody>
           </table>
@@ -727,8 +1063,8 @@
       <div class="field">
         <label>È una scorta?</label>
         <div class="scorta-toggle" id="scorta-toggle" onclick="toggleScorta()">
-          <div class="toggle-track" id="toggle-track">
-            <div class="toggle-thumb"></div>
+          <div class="toggle-track-modal" id="toggle-track">
+            <div class="toggle-thumb-modal"></div>
           </div>
           <span class="scorta-label" id="scorta-label">No</span>
         </div>
@@ -776,6 +1112,16 @@
     let famiglie = [], locazioni = [], allTags = [];
     let scorteState = false;
 
+    // ── FILTER STATE ──
+    const filterState = {
+      testo: '',
+      famiglia: '',
+      locazione: '',
+      tags: new Set(),      // set di id (number)
+      sottoScorta: false,
+      isScorta: false,
+    };
+
     /* ── AUTH ── */
     function authHeaders() {
       const token = localStorage.getItem('access');
@@ -812,18 +1158,18 @@
         acquisti: 'Acquisti', utenti: 'Utenti'
       };
       document.getElementById('pageTitle').textContent = titles[view] || view;
-      document.getElementById('searchInput').style.display = view === 'componenti' ? '' : 'none';
+      document.getElementById('compControls').style.display = view === 'componenti' ? 'flex' : 'none';
       currentView = view;
       loadView(view);
     }
 
     async function loadView(view) {
-      if (view === 'dashboard')   loadDashboard();
-      if (view === 'componenti')  loadComponenti();
-      if (view === 'magazzino')   loadMovimenti();
-      if (view === 'esperienze')  loadEsperienze();
-      if (view === 'acquisti')    loadAcquisti();
-      if (view === 'utenti')      loadUtenti();
+      if (view === 'dashboard')  loadDashboard();
+      if (view === 'componenti') loadComponenti();
+      if (view === 'magazzino')  loadMovimenti();
+      if (view === 'esperienze') loadEsperienze();
+      if (view === 'acquisti')   loadAcquisti();
+      if (view === 'utenti')     loadUtenti();
     }
 
     /* ── PROFILE ── */
@@ -842,7 +1188,7 @@
       } catch {}
     }
 
-    /* ── METADATA (famiglie, locazioni, tag) ── */
+    /* ── METADATA ── */
     async function loadMetadata() {
       try {
         const [f, l, t] = await Promise.all([
@@ -851,7 +1197,189 @@
           apiFetch(`${API}/tag/`).then(r => r.json()),
         ]);
         famiglie = f; locazioni = l; allTags = t;
+        buildFilterPopup();
       } catch {}
+    }
+
+    /* ── BUILD FILTER POPUP OPTIONS ── */
+    function buildFilterPopup() {
+      // Famiglie
+      const fSel = document.getElementById('f-famiglia');
+      fSel.innerHTML = '<option value="">Tutte le famiglie</option>' +
+        famiglie.map(f => `<option value="${f.id}">${f.nome}</option>`).join('');
+
+      // Locazioni
+      const lSel = document.getElementById('f-locazione');
+      lSel.innerHTML = '<option value="">Tutte le locazioni</option>' +
+        locazioni.map(l => `<option value="${l.id}">${l.ambiente} / ${l.sezione} / ${l.cassetto}</option>`).join('');
+
+      // Tag pills
+      const tagWrap = document.getElementById('f-tags');
+      if (allTags.length === 0) {
+        tagWrap.innerHTML = '<span style="color:var(--muted);font-size:0.82rem">Nessun tag disponibile</span>';
+      } else {
+        tagWrap.innerHTML = allTags.map(t =>
+          `<span class="tag-pill" data-id="${t.id}" onclick="toggleTagFilter(this, ${t.id})">${t.nome}</span>`
+        ).join('');
+      }
+    }
+
+    /* ── FILTER POPUP OPEN/CLOSE ── */
+    function toggleFilterPopup() {
+      const popup = document.getElementById('filterPopup');
+      popup.classList.toggle('open');
+    }
+
+    function closeFilterPopup() {
+      document.getElementById('filterPopup').classList.remove('open');
+    }
+
+    // Close popup clicking outside
+    document.addEventListener('click', e => {
+      const wrap = document.getElementById('filterWrap');
+      if (wrap && !wrap.contains(e.target)) closeFilterPopup();
+    });
+
+    /* ── TOGGLE HELPERS ── */
+    function toggleFilter(key) {
+      filterState[key] = !filterState[key];
+      const track = document.getElementById('t-' + key);
+      const label = document.getElementById('l-' + key);
+      track.classList.toggle('on', filterState[key]);
+      label.textContent = filterState[key] ? 'Sì' : 'No';
+      applyFilters();
+    }
+
+    function toggleTagFilter(el, id) {
+      if (filterState.tags.has(id)) {
+        filterState.tags.delete(id);
+        el.classList.remove('selected');
+      } else {
+        filterState.tags.add(id);
+        el.classList.add('selected');
+      }
+      applyFilters();
+    }
+
+    /* ── APPLY FILTERS ── */
+    function applyFilters() {
+      filterState.testo    = document.getElementById('searchInput').value.toLowerCase().trim();
+      filterState.famiglia = document.getElementById('f-famiglia').value;
+      filterState.locazione = document.getElementById('f-locazione').value;
+
+      const filtered = allComponents.filter(c => {
+        if (filterState.testo && !c.nome.toLowerCase().includes(filterState.testo)) return false;
+        if (filterState.famiglia && String(c.famiglia) !== filterState.famiglia) return false;
+        if (filterState.locazione && String(c.locazione) !== filterState.locazione) return false;
+        if (filterState.sottoScorta && c.quantita > c.quantita_minima) return false;
+        if (filterState.isScorta && !c.is_scorta) return false;
+        if (filterState.tags.size > 0) {
+          const compTags = c.tag || [];
+          for (const tid of filterState.tags) {
+            if (!compTags.includes(tid)) return false;
+          }
+        }
+        return true;
+      });
+
+      renderComponenti(filtered);
+      updateFilterUI();
+    }
+
+    /* ── UPDATE FILTER BADGE + CHIPS ── */
+    function updateFilterUI() {
+      let count = 0;
+      const chips = [];
+
+      if (filterState.testo) {
+        count++;
+        chips.push({ label: `Nome: "${filterState.testo}"`, remove: () => { document.getElementById('searchInput').value = ''; filterState.testo = ''; applyFilters(); } });
+      }
+      if (filterState.famiglia) {
+        count++;
+        const nome = famiglie.find(f => String(f.id) === filterState.famiglia)?.nome || filterState.famiglia;
+        chips.push({ label: `Famiglia: ${nome}`, remove: () => { document.getElementById('f-famiglia').value = ''; filterState.famiglia = ''; applyFilters(); } });
+      }
+      if (filterState.locazione) {
+        count++;
+        const loc = locazioni.find(l => String(l.id) === filterState.locazione);
+        const nome = loc ? `${loc.ambiente}/${loc.sezione}/${loc.cassetto}` : filterState.locazione;
+        chips.push({ label: `Locazione: ${nome}`, remove: () => { document.getElementById('f-locazione').value = ''; filterState.locazione = ''; applyFilters(); } });
+      }
+      if (filterState.sottoScorta) {
+        count++;
+        chips.push({ label: 'Sotto scorta', remove: () => { filterState.sottoScorta = false; document.getElementById('t-sottoScorta').classList.remove('on'); document.getElementById('l-sottoScorta').textContent = 'No'; applyFilters(); } });
+      }
+      if (filterState.isScorta) {
+        count++;
+        chips.push({ label: 'Solo scorte', remove: () => { filterState.isScorta = false; document.getElementById('t-isScorta').classList.remove('on'); document.getElementById('l-isScorta').textContent = 'No'; applyFilters(); } });
+      }
+      filterState.tags.forEach(tid => {
+        count++;
+        const nome = allTags.find(t => t.id === tid)?.nome || tid;
+        chips.push({ label: `Tag: ${nome}`, remove: () => {
+          filterState.tags.delete(tid);
+          const pill = document.querySelector(`.tag-pill[data-id="${tid}"]`);
+          if (pill) pill.classList.remove('selected');
+          applyFilters();
+        }});
+      });
+
+      // Badge
+      const badge = document.getElementById('filterBadge');
+      const btn   = document.getElementById('filterBtn');
+      if (count > 0) {
+        badge.textContent = count;
+        badge.classList.add('show');
+        btn.classList.add('active');
+      } else {
+        badge.classList.remove('show');
+        btn.classList.remove('active');
+      }
+
+      // Chips bar
+      const bar   = document.getElementById('activeFilters');
+      const chipsEl = document.getElementById('filterChips');
+      if (chips.length > 0) {
+        bar.classList.add('show');
+        chipsEl.innerHTML = chips.map((ch, i) =>
+          `<div class="filter-chip">
+            ${ch.label}
+            <button onclick="removeChip(${i})" title="Rimuovi">×</button>
+          </div>`
+        ).join('');
+        // Store remove functions for button onclick
+        window._chipRemovers = chips.map(c => c.remove);
+      } else {
+        bar.classList.remove('show');
+        chipsEl.innerHTML = '';
+        window._chipRemovers = [];
+      }
+    }
+
+    function removeChip(i) {
+      if (window._chipRemovers && window._chipRemovers[i]) window._chipRemovers[i]();
+    }
+
+    /* ── RESET FILTERS ── */
+    function resetFilters() {
+      document.getElementById('searchInput').value = '';
+      document.getElementById('f-famiglia').value = '';
+      document.getElementById('f-locazione').value = '';
+      filterState.testo = '';
+      filterState.famiglia = '';
+      filterState.locazione = '';
+      filterState.tags.clear();
+      filterState.sottoScorta = false;
+      filterState.isScorta = false;
+
+      document.querySelectorAll('.tag-pill').forEach(p => p.classList.remove('selected'));
+      ['sottoScorta', 'isScorta'].forEach(k => {
+        document.getElementById('t-' + k).classList.remove('on');
+        document.getElementById('l-' + k).textContent = 'No';
+      });
+
+      applyFilters();
     }
 
     /* ── DASHBOARD ── */
@@ -883,7 +1411,7 @@
 
         document.getElementById('dash-loader').style.display = 'none';
         document.getElementById('dash-table').style.display = '';
-      } catch (e) {
+      } catch {
         document.getElementById('dash-loader').innerHTML = '⚠️ Errore nel caricamento dati.';
       }
     }
@@ -895,7 +1423,10 @@
       try {
         const res = await apiFetch(`${API}/componenti/`);
         allComponents = await res.json();
-        renderComponenti(allComponents);
+        if (!famiglie.length) await loadMetadata();
+        applyFilters();
+        document.getElementById('comp-loader').style.display = 'none';
+        document.getElementById('comp-table').style.display = '';
       } catch {
         document.getElementById('comp-loader').innerHTML = '⚠️ Errore nel caricamento.';
       }
@@ -903,29 +1434,24 @@
 
     function renderComponenti(comps) {
       const tbody = document.getElementById('comp-tbody');
-      tbody.innerHTML = comps.length === 0
-        ? '<tr><td colspan="6" style="text-align:center;color:var(--muted);padding:24px">Nessun componente trovato</td></tr>'
-        : comps.map(c => `
-          <tr>
-            <td><strong>${c.nome}</strong></td>
-            <td>${c.famiglia ?? '—'}</td>
-            <td>${c.locazione ?? '—'}</td>
-            <td>${c.quantita}</td>
-            <td><span class="badge ${c.quantita <= c.quantita_minima ? 'badge-warn' : 'badge-ok'}">
-              ${c.quantita <= c.quantita_minima ? 'Sotto scorta' : 'OK'}
-            </span></td>
-            <td>${c.link_datasheet ? `<a href="${c.link_datasheet}" target="_blank" style="color:var(--accent)">↗ Apri</a>` : '—'}</td>
-            <td>
-              <button class="btn-edit" onclick="openEditModal(${c.id})">✏ Modifica</button>
-            </td>
-          </tr>`).join('');
-      document.getElementById('comp-loader').style.display = 'none';
-      document.getElementById('comp-table').style.display = '';
-    }
-
-    function filterTable() {
-      const q = document.getElementById('searchInput').value.toLowerCase();
-      renderComponenti(allComponents.filter(c => c.nome.toLowerCase().includes(q)));
+      if (comps.length === 0) {
+        tbody.innerHTML = '<tr class="empty-row"><td colspan="7">Nessun componente corrisponde ai filtri selezionati.</td></tr>';
+        return;
+      }
+      tbody.innerHTML = comps.map(c => `
+        <tr>
+          <td><strong>${c.nome}</strong></td>
+          <td>${famiglie.find(f => f.id === c.famiglia)?.nome ?? '—'}</td>
+          <td>${locazioni.find(l => l.id === c.locazione) ? `${locazioni.find(l => l.id === c.locazione).ambiente}/${locazioni.find(l => l.id === c.locazione).sezione}` : '—'}</td>
+          <td>${c.quantita}</td>
+          <td><span class="badge ${c.quantita <= c.quantita_minima ? 'badge-warn' : 'badge-ok'}">
+            ${c.quantita <= c.quantita_minima ? 'Sotto scorta' : 'OK'}
+          </span></td>
+          <td>${c.link_datasheet ? `<a href="${c.link_datasheet}" target="_blank" style="color:var(--accent)">↗ Apri</a>` : '—'}</td>
+          <td>
+            <button class="btn-edit" onclick="openEditModal(${c.id})">✏ Modifica</button>
+          </td>
+        </tr>`).join('');
     }
 
     /* ── EDIT MODAL ── */
@@ -933,30 +1459,23 @@
       const comp = allComponents.find(c => c.id === id);
       if (!comp) return;
 
-      // Carica metadata se non ancora caricato
-      if (!famiglie.length && !locazioni.length) await loadMetadata();
-
       document.getElementById('e-id').value = comp.id;
       document.getElementById('e-nome').value = comp.nome;
       document.getElementById('e-qty').value = comp.quantita;
       document.getElementById('e-qtymin').value = comp.quantita_minima;
       document.getElementById('edit-error').style.display = 'none';
 
-      // Scorta toggle
       scorteState = comp.is_scorta;
       updateScortaUI();
 
-      // Famiglie
       const fSel = document.getElementById('e-famiglia');
       fSel.innerHTML = '<option value="">— Nessuna —</option>' +
         famiglie.map(f => `<option value="${f.id}" ${comp.famiglia == f.id ? 'selected' : ''}>${f.nome}</option>`).join('');
 
-      // Locazioni
       const lSel = document.getElementById('e-locazione');
       lSel.innerHTML = '<option value="">— Nessuna —</option>' +
         locazioni.map(l => `<option value="${l.id}" ${comp.locazione == l.id ? 'selected' : ''}>${l.ambiente} / ${l.sezione} / ${l.cassetto}</option>`).join('');
 
-      // Tag checkboxes
       const compTags = comp.tag || [];
       const wrap = document.getElementById('e-tags-wrap');
       if (allTags.length === 0) {
@@ -973,7 +1492,7 @@
       document.getElementById('modal-editComp').classList.add('open');
     }
 
-    function toggleTag(el, id) {
+    function toggleTag(el) {
       el.classList.toggle('selected');
       const cb = el.querySelector('input');
       cb.checked = !cb.checked;
@@ -1181,7 +1700,6 @@
       setTimeout(() => t.className = '', 3000);
     }
 
-    // Chiudi overlay cliccando fuori
     document.querySelectorAll('.overlay').forEach(o => {
       o.addEventListener('click', e => { if (e.target === o) o.classList.remove('open'); });
     });
@@ -1190,7 +1708,6 @@
     (async () => {
       await loadProfile();
       loadDashboard();
-      document.getElementById('searchInput').style.display = 'none';
     })();
   </script>
 </body>
