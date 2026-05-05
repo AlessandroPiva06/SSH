@@ -40,7 +40,6 @@
       position: fixed;
       top: 0; left: 0; bottom: 0;
       z-index: 100;
-      transition: transform 0.3s ease;
     }
 
     .sidebar-logo {
@@ -94,7 +93,6 @@
 
     .nav-link:hover { background: var(--surface2); color: var(--text); }
     .nav-link.active { background: rgba(232,184,109,0.12); color: var(--accent); font-weight: 600; }
-
     .nav-link .icon { font-size: 1rem; width: 20px; text-align: center; }
 
     .sidebar-footer {
@@ -128,8 +126,7 @@
     .logout-btn {
       background: none; border: none;
       color: var(--muted); cursor: pointer;
-      font-size: 1.1rem;
-      padding: 4px;
+      font-size: 1.1rem; padding: 4px;
       transition: color 0.2s;
     }
     .logout-btn:hover { color: var(--danger); }
@@ -162,9 +159,7 @@
       flex: 1;
     }
 
-    .search-wrap {
-      position: relative;
-    }
+    .search-wrap { position: relative; }
 
     .search-wrap input {
       background: var(--surface);
@@ -194,7 +189,7 @@
     .view { display: none; }
     .view.active { display: block; }
 
-    /* ── STATS CARDS ── */
+    /* ── STATS ── */
     .stats-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
@@ -233,10 +228,7 @@
       margin-bottom: 16px;
     }
 
-    .table-title {
-      font-family: 'DM Serif Display', serif;
-      font-size: 1.15rem;
-    }
+    .table-title { font-family: 'DM Serif Display', serif; font-size: 1.15rem; }
 
     .btn {
       padding: 8px 16px;
@@ -253,6 +245,19 @@
     .btn-primary:hover { background: var(--accent2); }
     .btn-ghost { background: var(--surface); color: var(--text); border: 1px solid var(--border); }
     .btn-ghost:hover { border-color: var(--accent); color: var(--accent); }
+    .btn-edit {
+      background: rgba(232,184,109,0.08);
+      color: var(--accent);
+      border: 1px solid rgba(232,184,109,0.25);
+      padding: 5px 11px;
+      border-radius: 6px;
+      font-size: 0.78rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.15s;
+      font-family: 'DM Sans', sans-serif;
+    }
+    .btn-edit:hover { background: rgba(232,184,109,0.18); border-color: var(--accent); }
 
     .table-wrap {
       background: var(--surface);
@@ -262,7 +267,6 @@
     }
 
     table { width: 100%; border-collapse: collapse; }
-
     thead tr { border-bottom: 1px solid var(--border); }
 
     th {
@@ -296,7 +300,7 @@
     .badge-warn    { background: rgba(224,92,92,0.15); color: var(--danger); }
     .badge-neutral { background: rgba(122,127,150,0.15); color: var(--muted); }
 
-    /* ── LOADING / EMPTY ── */
+    /* ── LOADING ── */
     .loader {
       text-align: center;
       padding: 48px;
@@ -333,7 +337,9 @@
       border-radius: 14px;
       padding: 32px;
       width: 100%;
-      max-width: 440px;
+      max-width: 480px;
+      max-height: 90vh;
+      overflow-y: auto;
       animation: fadeUp 0.25s ease both;
     }
 
@@ -360,7 +366,10 @@
       margin-bottom: 6px;
     }
 
-    .modal input, .modal select {
+    .modal input[type="text"],
+    .modal input[type="number"],
+    .modal input[type="url"],
+    .modal select {
       width: 100%;
       padding: 10px 14px;
       background: var(--bg);
@@ -369,6 +378,7 @@
       color: var(--text);
       font-family: 'DM Sans', sans-serif;
       font-size: 0.9rem;
+      transition: border-color 0.2s;
     }
 
     .modal input:focus, .modal select:focus {
@@ -376,11 +386,104 @@
       border-color: var(--accent);
     }
 
+    .modal-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    /* Tag checkboxes */
+    .tags-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+
+    .tag-check {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      padding: 5px 10px;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      font-size: 0.8rem;
+      cursor: pointer;
+      transition: all 0.15s;
+      color: var(--muted);
+    }
+
+    .tag-check input { display: none; }
+
+    .tag-check.selected {
+      background: rgba(232,184,109,0.12);
+      border-color: rgba(232,184,109,0.4);
+      color: var(--accent);
+    }
+
+    /* Scorta toggle */
+    .scorta-toggle {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 14px;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      cursor: pointer;
+      transition: border-color 0.2s;
+    }
+
+    .scorta-toggle:hover { border-color: var(--accent); }
+
+    .toggle-track {
+      width: 38px; height: 22px;
+      background: var(--border);
+      border-radius: 11px;
+      position: relative;
+      transition: background 0.2s;
+      flex-shrink: 0;
+    }
+
+    .toggle-track.on { background: var(--accent); }
+
+    .toggle-thumb {
+      width: 16px; height: 16px;
+      background: white;
+      border-radius: 50%;
+      position: absolute;
+      top: 3px; left: 3px;
+      transition: transform 0.2s;
+    }
+
+    .toggle-track.on .toggle-thumb { transform: translateX(16px); }
+
+    .scorta-label { font-size: 0.9rem; color: var(--text); }
+
     .modal-actions {
       display: flex;
       gap: 10px;
       margin-top: 24px;
     }
+
+    /* Toast */
+    #toast {
+      position: fixed;
+      bottom: 24px; right: 24px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 12px 18px;
+      font-size: 0.88rem;
+      z-index: 999;
+      transform: translateY(80px);
+      opacity: 0;
+      transition: all 0.3s;
+    }
+
+    #toast.show { transform: translateY(0); opacity: 1; }
+    #toast.ok   { border-color: var(--success); color: var(--success); }
+    #toast.err  { border-color: var(--danger); color: var(--danger); }
   </style>
 </head>
 <body>
@@ -493,7 +596,7 @@
           <div class="loader" id="comp-loader"><div class="spinner"></div><br>Caricamento…</div>
           <table id="comp-table" style="display:none">
             <thead><tr>
-              <th>Nome</th><th>Famiglia</th><th>Locazione</th><th>Quantità</th><th>Datasheet</th><th>Stato</th>
+              <th>Nome</th><th>Famiglia</th><th>Locazione</th><th>Quantità</th><th>Stato</th><th>Datasheet</th>><th>Azioni</th>
             </tr></thead>
             <tbody id="comp-tbody"></tbody>
           </table>
@@ -545,7 +648,7 @@
         </div>
       </div>
 
-      <!-- UTENTI (admin) -->
+      <!-- UTENTI -->
       <div class="view" id="view-utenti">
         <div class="table-header">
           <div class="table-title">Gestione Utenti</div>
@@ -559,20 +662,83 @@
         </div>
       </div>
 
-    </div><!-- /content -->
-  </div><!-- /main -->
+    </div>
+  </div>
 
   <!-- ── MODAL AGGIUNGI COMPONENTE ── -->
   <div class="overlay" id="modal-addComp">
     <div class="modal">
       <h3>Nuovo Componente</h3>
-      <div class="field"><label>Nome</label><input id="c-nome" placeholder="es. Resistenza 10kΩ"></div>
-      <div class="field"><label>Quantità</label><input id="c-qty" type="number" value="0" min="0"></div>
-      <div class="field"><label>Quantità minima</label><input id="c-qtymin" type="number" value="0" min="0"></div>
+      <div class="field"><label>Nome</label><input type="text" id="c-nome" placeholder="es. Resistenza 10kΩ"></div>
+      <div class="modal-row">
+        <div class="field"><label>Quantità</label><input id="c-qty" type="number" value="0" min="0"></div>
+        <div class="field"><label>Quantità minima</label><input id="c-qtymin" type="number" value="0" min="0"></div>
+      </div>
       <div class="field"><label>Link datasheet</label><input id="c-ds" type="url" placeholder="https://…"></div>
       <div class="modal-actions">
         <button class="btn btn-primary" onclick="salvaComponente()">Salva</button>
         <button class="btn btn-ghost" onclick="closeModal('addComp')">Annulla</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── MODAL MODIFICA COMPONENTE ── -->
+  <div class="overlay" id="modal-editComp">
+    <div class="modal">
+      <h3>Modifica Componente</h3>
+      <input type="hidden" id="e-id">
+
+      <div class="field">
+        <label>Nome</label>
+        <input type="text" id="e-nome" placeholder="es. Resistenza 10kΩ">
+      </div>
+
+      <div class="modal-row">
+        <div class="field">
+          <label>Quantità</label>
+          <input type="number" id="e-qty" min="0">
+        </div>
+        <div class="field">
+          <label>Quantità minima</label>
+          <input type="number" id="e-qtymin" min="0">
+        </div>
+      </div>
+
+      <div class="modal-row">
+        <div class="field">
+          <label>Famiglia</label>
+          <select id="e-famiglia">
+            <option value="">— Nessuna —</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Locazione</label>
+          <select id="e-locazione">
+            <option value="">— Nessuna —</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="field">
+        <label>Tag</label>
+        <div class="tags-grid" id="e-tags-wrap"></div>
+      </div>
+
+      <div class="field">
+        <label>È una scorta?</label>
+        <div class="scorta-toggle" id="scorta-toggle" onclick="toggleScorta()">
+          <div class="toggle-track" id="toggle-track">
+            <div class="toggle-thumb"></div>
+          </div>
+          <span class="scorta-label" id="scorta-label">No</span>
+        </div>
+      </div>
+
+      <div id="edit-error" style="display:none; background:rgba(224,92,92,0.1); border:1px solid rgba(224,92,92,0.3); border-radius:8px; padding:10px 14px; font-size:0.85rem; color:var(--danger); margin-top:8px;"></div>
+
+      <div class="modal-actions">
+        <button class="btn btn-primary" onclick="salvaModifica()">Salva modifiche</button>
+        <button class="btn btn-ghost" onclick="closeModal('editComp')">Annulla</button>
       </div>
     </div>
   </div>
@@ -593,7 +759,7 @@
         </select>
       </div>
       <div class="field"><label>Quantità</label><input id="m-qty" type="number" value="1" min="1"></div>
-      <div class="field"><label>Note</label><input id="m-note" placeholder="opzionale"></div>
+      <div class="field"><label>Note</label><input type="text" id="m-note" placeholder="opzionale"></div>
       <div class="modal-actions">
         <button class="btn btn-primary" onclick="salvaMovimento()">Salva</button>
         <button class="btn btn-ghost" onclick="closeModal('addMov')">Annulla</button>
@@ -601,10 +767,14 @@
     </div>
   </div>
 
+  <div id="toast"></div>
+
   <script>
     const API = 'http://localhost:8000/api';
     let currentView = 'dashboard';
     let allComponents = [];
+    let famiglie = [], locazioni = [], allTags = [];
+    let scorteState = false;
 
     /* ── AUTH ── */
     function authHeaders() {
@@ -630,14 +800,12 @@
     function showView(view) {
       document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
       document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
-
       document.getElementById('view-' + view).classList.add('active');
       document.querySelectorAll('.nav-link').forEach(l => {
         if (l.getAttribute('onclick') && l.getAttribute('onclick').includes(`'${view}'`)) {
           l.classList.add('active');
         }
       });
-
       const titles = {
         dashboard: 'Dashboard', componenti: 'Componenti',
         magazzino: 'Movimenti', esperienze: 'Esperienze',
@@ -645,18 +813,17 @@
       };
       document.getElementById('pageTitle').textContent = titles[view] || view;
       document.getElementById('searchInput').style.display = view === 'componenti' ? '' : 'none';
-
       currentView = view;
       loadView(view);
     }
 
     async function loadView(view) {
-      if (view === 'dashboard')    loadDashboard();
-      if (view === 'componenti')   loadComponenti();
-      if (view === 'magazzino')    loadMovimenti();
-      if (view === 'esperienze')   loadEsperienze();
-      if (view === 'acquisti')     loadAcquisti();
-      if (view === 'utenti')       loadUtenti();
+      if (view === 'dashboard')   loadDashboard();
+      if (view === 'componenti')  loadComponenti();
+      if (view === 'magazzino')   loadMovimenti();
+      if (view === 'esperienze')  loadEsperienze();
+      if (view === 'acquisti')    loadAcquisti();
+      if (view === 'utenti')      loadUtenti();
     }
 
     /* ── PROFILE ── */
@@ -668,11 +835,22 @@
         document.getElementById('userName').textContent = u.username;
         document.getElementById('userRole').textContent = u.ruolo;
         document.getElementById('userAvatar').textContent = u.username[0].toUpperCase();
-
         if (['admin','tecnico'].includes(u.ruolo)) {
           document.getElementById('adminSection').style.display = '';
           document.querySelectorAll('.admin-only').forEach(el => el.style.display = '');
         }
+      } catch {}
+    }
+
+    /* ── METADATA (famiglie, locazioni, tag) ── */
+    async function loadMetadata() {
+      try {
+        const [f, l, t] = await Promise.all([
+          apiFetch(`${API}/famiglie/`).then(r => r.json()),
+          apiFetch(`${API}/locazioni/`).then(r => r.json()),
+          apiFetch(`${API}/tag/`).then(r => r.json()),
+        ]);
+        famiglie = f; locazioni = l; allTags = t;
       } catch {}
     }
 
@@ -686,7 +864,6 @@
         ]);
 
         const sottoScorta = comps.filter(c => c.quantita <= c.quantita_minima);
-
         document.getElementById('stat-comp').textContent = comps.length;
         document.getElementById('stat-scorta').textContent = sottoScorta.length;
         document.getElementById('stat-mov').textContent = movs.length;
@@ -734,10 +911,13 @@
             <td>${c.famiglia ?? '—'}</td>
             <td>${c.locazione ?? '—'}</td>
             <td>${c.quantita}</td>
-            <td>${c.link_datasheet ? `<a href="${c.link_datasheet}" target="_blank" style="color:var(--accent)">↗ Apri</a>` : '—'}</td>
             <td><span class="badge ${c.quantita <= c.quantita_minima ? 'badge-warn' : 'badge-ok'}">
               ${c.quantita <= c.quantita_minima ? 'Sotto scorta' : 'OK'}
             </span></td>
+            <td>${c.link_datasheet ? `<a href="${c.link_datasheet}" target="_blank" style="color:var(--accent)">↗ Apri</a>` : '—'}</td>
+            <td>
+              <button class="btn-edit" onclick="openEditModal(${c.id})">✏ Modifica</button>
+            </td>
           </tr>`).join('');
       document.getElementById('comp-loader').style.display = 'none';
       document.getElementById('comp-table').style.display = '';
@@ -745,10 +925,114 @@
 
     function filterTable() {
       const q = document.getElementById('searchInput').value.toLowerCase();
-      const filtered = allComponents.filter(c =>
-        c.nome.toLowerCase().includes(q)
-      );
-      renderComponenti(filtered);
+      renderComponenti(allComponents.filter(c => c.nome.toLowerCase().includes(q)));
+    }
+
+    /* ── EDIT MODAL ── */
+    async function openEditModal(id) {
+      const comp = allComponents.find(c => c.id === id);
+      if (!comp) return;
+
+      // Carica metadata se non ancora caricato
+      if (!famiglie.length && !locazioni.length) await loadMetadata();
+
+      document.getElementById('e-id').value = comp.id;
+      document.getElementById('e-nome').value = comp.nome;
+      document.getElementById('e-qty').value = comp.quantita;
+      document.getElementById('e-qtymin').value = comp.quantita_minima;
+      document.getElementById('edit-error').style.display = 'none';
+
+      // Scorta toggle
+      scorteState = comp.is_scorta;
+      updateScortaUI();
+
+      // Famiglie
+      const fSel = document.getElementById('e-famiglia');
+      fSel.innerHTML = '<option value="">— Nessuna —</option>' +
+        famiglie.map(f => `<option value="${f.id}" ${comp.famiglia == f.id ? 'selected' : ''}>${f.nome}</option>`).join('');
+
+      // Locazioni
+      const lSel = document.getElementById('e-locazione');
+      lSel.innerHTML = '<option value="">— Nessuna —</option>' +
+        locazioni.map(l => `<option value="${l.id}" ${comp.locazione == l.id ? 'selected' : ''}>${l.ambiente} / ${l.sezione} / ${l.cassetto}</option>`).join('');
+
+      // Tag checkboxes
+      const compTags = comp.tag || [];
+      const wrap = document.getElementById('e-tags-wrap');
+      if (allTags.length === 0) {
+        wrap.innerHTML = '<span style="color:var(--muted);font-size:0.82rem">Nessun tag disponibile</span>';
+      } else {
+        wrap.innerHTML = allTags.map(t => {
+          const sel = compTags.includes(t.id);
+          return `<label class="tag-check ${sel ? 'selected' : ''}" id="tag-${t.id}" onclick="toggleTag(this, ${t.id})">
+            <input type="checkbox" value="${t.id}" ${sel ? 'checked' : ''}> ${t.nome}
+          </label>`;
+        }).join('');
+      }
+
+      document.getElementById('modal-editComp').classList.add('open');
+    }
+
+    function toggleTag(el, id) {
+      el.classList.toggle('selected');
+      const cb = el.querySelector('input');
+      cb.checked = !cb.checked;
+    }
+
+    function toggleScorta() {
+      scorteState = !scorteState;
+      updateScortaUI();
+    }
+
+    function updateScortaUI() {
+      const track = document.getElementById('toggle-track');
+      const label = document.getElementById('scorta-label');
+      track.classList.toggle('on', scorteState);
+      label.textContent = scorteState ? 'Sì' : 'No';
+    }
+
+    async function salvaModifica() {
+      const id = document.getElementById('e-id').value;
+      const errBox = document.getElementById('edit-error');
+      errBox.style.display = 'none';
+
+      const selectedTags = [...document.querySelectorAll('#e-tags-wrap input:checked')]
+        .map(i => parseInt(i.value));
+
+      const famigliaVal = document.getElementById('e-famiglia').value;
+      const locazioneVal = document.getElementById('e-locazione').value;
+
+      const body = {
+        nome: document.getElementById('e-nome').value.trim(),
+        quantita: parseInt(document.getElementById('e-qty').value),
+        quantita_minima: parseInt(document.getElementById('e-qtymin').value),
+        is_scorta: scorteState,
+        famiglia: famigliaVal ? parseInt(famigliaVal) : null,
+        locazione: locazioneVal ? parseInt(locazioneVal) : null,
+        tag: selectedTags,
+      };
+
+      if (!body.nome) {
+        errBox.textContent = 'Il nome non può essere vuoto.';
+        errBox.style.display = 'block';
+        return;
+      }
+
+      try {
+        const res = await apiFetch(`${API}/componenti/${id}/`, {
+          method: 'PATCH',
+          body: JSON.stringify(body)
+        });
+
+        if (!res.ok) throw new Error();
+
+        closeModal('editComp');
+        showToast('Componente aggiornato!', 'ok');
+        loadComponenti();
+      } catch {
+        errBox.textContent = 'Errore durante il salvataggio. Riprova.';
+        errBox.style.display = 'block';
+      }
     }
 
     /* ── MOVIMENTI ── */
@@ -889,7 +1173,15 @@
       loadMovimenti();
     }
 
-    // Close modal on overlay click
+    /* ── TOAST ── */
+    function showToast(msg, type = '') {
+      const t = document.getElementById('toast');
+      t.textContent = msg;
+      t.className = `show ${type}`;
+      setTimeout(() => t.className = '', 3000);
+    }
+
+    // Chiudi overlay cliccando fuori
     document.querySelectorAll('.overlay').forEach(o => {
       o.addEventListener('click', e => { if (e.target === o) o.classList.remove('open'); });
     });
