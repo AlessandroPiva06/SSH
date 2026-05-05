@@ -164,3 +164,12 @@ SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': timedelta(hours=8),
     'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
 }
+
+# Email
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = 'faustodeiaco0@gmail.com'       # ← la tua email
+EMAIL_HOST_PASSWORD = 'qxkz hque ihbx fkfa'   # ← password app Gmail
+DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
