@@ -14,12 +14,13 @@ class RegistrazioneSerializer(serializers.ModelSerializer):
         fields = ['username', 'email', 'password', 'ruolo']
 
     def create(self, validated_data):
+        ruolo = validated_data.get('ruolo', 'professore')
         utente = Utente.objects.create_user(
             username=validated_data['username'],
             email=validated_data['email'],
             password=validated_data['password'],
-            ruolo=validated_data.get('ruolo', 'professore'),
+            ruolo=ruolo,
             approvato=False,
-            is_staff=False  # ← aggiungi questa
+            is_staff=ruolo in ['admin', 'tecnico']
         )
         return utente

@@ -88,7 +88,10 @@ class LogSerializer(drf_serializers.ModelSerializer):
 class LogView(generics.ListAPIView):
     permission_classes = [permissions.IsAuthenticated]
 
+    def get(self, request, *args, **kwargs):
+        if request.user.ruolo != 'admin':
+            return Response({'errore': 'Non autorizzato'}, status=403)
+        return super().get(request, *args, **kwargs)
+
     def get_queryset(self):
-        if self.request.user.ruolo != 'admin':
-            return LogAzione.objects.none()  # restituisce lista vuota
         return LogAzione.objects.exclude(utente__ruolo='admin')
