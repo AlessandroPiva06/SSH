@@ -19,6 +19,7 @@ class RegistrazioneSerializer(serializers.ModelSerializer):
             email=validated_data['email'],
             password=validated_data['password'],
             ruolo=validated_data.get('ruolo', 'professore'),
-            approvato=False  # deve essere approvato da admin/tecnico
+            approvato=False,
+            is_staff=False  # ← aggiungi questa
         )
         return utente
