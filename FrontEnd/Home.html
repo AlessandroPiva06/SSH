@@ -1451,6 +1451,9 @@
           <td>
             <button class="btn-edit" onclick="openEditModal(${c.id})">✏ Modifica</button>
           </td>
+           <td>
+            <button class="btn-edit" style="color:var(--danger);border-color:rgba(224,92,92,0.3);background:rgba(224,92,92,0.08)" onclick="eliminaComponente(${c.id}, '${c.nome.replace(/'/g, "\\'")}')">🗑</button>
+          </td>
         </tr>`).join('');
     }
 
@@ -1491,6 +1494,20 @@
 
       document.getElementById('modal-editComp').classList.add('open');
     }
+
+
+    async function eliminaComponente(id, nome) {
+    if (!confirm(`Eliminare "${nome}"? L'operazione è irreversibile.`)) return;
+    try {
+        const res = await apiFetch(`${API}/componenti/${id}/`, { method: 'DELETE' });
+        if (!res.ok) throw new Error();
+        showToast('Componente eliminato.', 'ok');
+        loadComponenti();
+    } catch {
+        showToast('Errore durante l\'eliminazione.', 'err');
+    }
+}
+
 
     function toggleTag(el) {
       el.classList.toggle('selected');
@@ -1687,7 +1704,14 @@
         quantita: parseInt(document.getElementById('m-qty').value),
         note: document.getElementById('m-note').value,
       };
-      await apiFetch(`${API}/movimenti/`, { method: 'POST', body: JSON.stringify(body) });
+      const res =await apiFetch(`${API}/movimenti/`, { method: 'POST', body: JSON.stringify(body) });
+      if (!res.ok) {
+        const err = await res.json();
+        const msg = err[0] || err.detail || 'Errore durante il salvataggio.';
+        showToast(msg, 'err');
+        return;
+    }
+
       closeModal('addMov');
       loadMovimenti();
     }
