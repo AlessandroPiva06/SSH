@@ -1,4 +1,4 @@
-#!/home/studente/PyCharmMiscProject/SSH/venv/bin/python3.12
+#!/home/studente/PycharmProjects/PythonProject1/SSH/venv/bin/python3.12
 # -*- coding: utf-8 -*-
 import re
 import sys
