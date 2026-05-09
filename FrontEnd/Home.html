@@ -762,6 +762,13 @@
         <span class="icon">📦</span> Movimenti
       </a>
 
+      <a class="nav-link admin-only" style="display:none" onclick="showView('famiglie')">
+    <span class="icon">🗂</span> Famiglie
+</a>
+<a class="nav-link admin-only" style="display:none" onclick="showView('locazioni')">
+    <span class="icon">📍</span> Locazioni
+</a>
+
       <div class="nav-section">Liste</div>
       <a class="nav-link" onclick="showView('esperienze')">
         <span class="icon">🧪</span> Esperienze
@@ -956,6 +963,41 @@
         </div>
       </div>
 
+
+      <!-- FAMIGLIE -->
+<div class="view" id="view-famiglie">
+    <div class="table-header">
+        <div class="table-title">Famiglie</div>
+        <button class="btn btn-primary" onclick="openModal('addFam')">+ Aggiungi</button>
+    </div>
+    <div class="table-wrap">
+        <div class="loader" id="fam-loader"><div class="spinner"></div><br>Caricamento…</div>
+        <table id="fam-table" style="display:none">
+            <thead><tr>
+                <th>Nome</th><th>Parent</th><th>Azioni</th>
+            </tr></thead>
+            <tbody id="fam-tbody"></tbody>
+        </table>
+    </div>
+</div>
+
+<!-- LOCAZIONI -->
+<div class="view" id="view-locazioni">
+    <div class="table-header">
+        <div class="table-title">Locazioni</div>
+        <button class="btn btn-primary" onclick="openModal('addLoc')">+ Aggiungi</button>
+    </div>
+    <div class="table-wrap">
+        <div class="loader" id="loc-loader"><div class="spinner"></div><br>Caricamento…</div>
+        <table id="loc-table" style="display:none">
+            <thead><tr>
+                <th>Ambiente</th><th>Sezione</th><th>Cassetto</th><th>Azioni</th>
+            </tr></thead>
+            <tbody id="loc-tbody"></tbody>
+        </table>
+    </div>
+</div>
+
       <!-- ESPERIENZE -->
       <div class="view" id="view-esperienze">
         <div class="table-header">
@@ -1001,22 +1043,48 @@
     </div>
   </div>
 
-  <!-- ── MODAL AGGIUNGI COMPONENTE ── -->
-  <div class="overlay" id="modal-addComp">
+ <!-- MODAL AGGIUNGI COMPONENTE -->
+<div class="overlay" id="modal-addComp">
     <div class="modal">
-      <h3>Nuovo Componente</h3>
-      <div class="field"><label>Nome</label><input type="text" id="c-nome" placeholder="es. Resistenza 10kΩ"></div>
-      <div class="modal-row">
-        <div class="field"><label>Quantità</label><input id="c-qty" type="number" value="0" min="0"></div>
-        <div class="field"><label>Quantità minima</label><input id="c-qtymin" type="number" value="0" min="0"></div>
-      </div>
-      <div class="field"><label>Link datasheet</label><input id="c-ds" type="url" placeholder="https://…"></div>
-      <div class="modal-actions">
-        <button class="btn btn-primary" onclick="salvaComponente()">Salva</button>
-        <button class="btn btn-ghost" onclick="closeModal('addComp')">Annulla</button>
-      </div>
+        <h3>Nuovo Componente</h3>
+        <div class="field">
+            <label>Nome</label>
+            <input type="text" id="c-nome" placeholder="es. Resistenza 10kΩ">
+        </div>
+        <div class="modal-row">
+            <div class="field">
+                <label>Quantità</label>
+                <input id="c-qty" type="number" value="0" min="0">
+            </div>
+            <div class="field">
+                <label>Quantità minima</label>
+                <input id="c-qtymin" type="number" value="0" min="0">
+            </div>
+        </div>
+        <div class="modal-row">
+            <div class="field">
+                <label>Famiglia</label>
+                <select id="c-famiglia">
+                    <option value="">— Nessuna —</option>
+                </select>
+            </div>
+            <div class="field">
+                <label>Locazione</label>
+                <select id="c-locazione">
+                    <option value="">— Nessuna —</option>
+                </select>
+            </div>
+        </div>
+        <div class="field">
+            <label>Link datasheet</label>
+            <input id="c-ds" type="url" placeholder="https://…">
+        </div>
+        <div class="modal-actions">
+            <button class="btn btn-primary" onclick="salvaComponente()">Salva</button>
+            <button class="btn btn-ghost" onclick="closeModal('addComp')">Annulla</button>
+        </div>
     </div>
-  </div>
+</div>
 
   <!-- ── MODAL MODIFICA COMPONENTE ── -->
   <div class="overlay" id="modal-editComp">
@@ -1103,6 +1171,97 @@
     </div>
   </div>
 
+
+  <!-- MODAL NUOVA FAMIGLIA -->
+<div class="overlay" id="modal-addFam">
+    <div class="modal">
+        <h3>Nuova Famiglia</h3>
+        <div class="field">
+            <label>Nome</label>
+            <input type="text" id="af-nome" placeholder="es. Resistenze">
+        </div>
+        <div class="field">
+            <label>Famiglia parent (opzionale)</label>
+            <select id="af-parent">
+                <option value="">— Nessuna —</option>
+            </select>
+        </div>
+        <div class="modal-actions">
+            <button class="btn btn-primary" onclick="salvaFamiglia()">Salva</button>
+            <button class="btn btn-ghost" onclick="closeModal('addFam')">Annulla</button>
+        </div>
+    </div>
+</div>
+
+<!-- MODAL MODIFICA FAMIGLIA -->
+<div class="overlay" id="modal-editFam">
+    <div class="modal">
+        <h3>Modifica Famiglia</h3>
+        <input type="hidden" id="ef-id">
+        <div class="field">
+            <label>Nome</label>
+            <input type="text" id="ef-nome">
+        </div>
+        <div class="field">
+            <label>Famiglia parent (opzionale)</label>
+            <select id="ef-parent">
+                <option value="">— Nessuna —</option>
+            </select>
+        </div>
+        <div class="modal-actions">
+            <button class="btn btn-primary" onclick="salvaModificaFamiglia()">Salva modifiche</button>
+            <button class="btn btn-ghost" onclick="closeModal('editFam')">Annulla</button>
+        </div>
+    </div>
+</div>
+
+<!-- MODAL NUOVA LOCAZIONE -->
+<div class="overlay" id="modal-addLoc">
+    <div class="modal">
+        <h3>Nuova Locazione</h3>
+        <div class="field">
+            <label>Ambiente</label>
+            <input type="text" id="al-ambiente" placeholder="es. Laboratorio A">
+        </div>
+        <div class="field">
+            <label>Sezione</label>
+            <input type="text" id="al-sezione" placeholder="es. Scaffale 3">
+        </div>
+        <div class="field">
+            <label>Cassetto</label>
+            <input type="text" id="al-cassetto" placeholder="es. C2">
+        </div>
+        <div class="modal-actions">
+            <button class="btn btn-primary" onclick="salvaLocazione()">Salva</button>
+            <button class="btn btn-ghost" onclick="closeModal('addLoc')">Annulla</button>
+        </div>
+    </div>
+</div>
+
+<!-- MODAL MODIFICA LOCAZIONE -->
+<div class="overlay" id="modal-editLoc">
+    <div class="modal">
+        <h3>Modifica Locazione</h3>
+        <input type="hidden" id="el-id">
+        <div class="field">
+            <label>Ambiente</label>
+            <input type="text" id="el-ambiente">
+        </div>
+        <div class="field">
+            <label>Sezione</label>
+            <input type="text" id="el-sezione">
+        </div>
+        <div class="field">
+            <label>Cassetto</label>
+            <input type="text" id="el-cassetto">
+        </div>
+        <div class="modal-actions">
+            <button class="btn btn-primary" onclick="salvaModificaLocazione()">Salva modifiche</button>
+            <button class="btn btn-ghost" onclick="closeModal('editLoc')">Annulla</button>
+        </div>
+    </div>
+</div>
+
   <div id="toast"></div>
 
   <script>
@@ -1152,25 +1311,30 @@
           l.classList.add('active');
         }
       });
-      const titles = {
-        dashboard: 'Dashboard', componenti: 'Componenti',
-        magazzino: 'Movimenti', esperienze: 'Esperienze',
-        acquisti: 'Acquisti', utenti: 'Utenti'
-      };
+      // Aggiungi dentro l'oggetto titles:
+const titles = {
+    dashboard: 'Dashboard', componenti: 'Componenti',
+    magazzino: 'Movimenti', esperienze: 'Esperienze',
+    acquisti: 'Acquisti', utenti: 'Utenti',
+    famiglie: 'Famiglie', locazioni: 'Locazioni'   // ← aggiungi questi
+};
       document.getElementById('pageTitle').textContent = titles[view] || view;
       document.getElementById('compControls').style.display = view === 'componenti' ? 'flex' : 'none';
       currentView = view;
       loadView(view);
     }
 
-    async function loadView(view) {
-      if (view === 'dashboard')  loadDashboard();
-      if (view === 'componenti') loadComponenti();
-      if (view === 'magazzino')  loadMovimenti();
-      if (view === 'esperienze') loadEsperienze();
-      if (view === 'acquisti')   loadAcquisti();
-      if (view === 'utenti')     loadUtenti();
-    }
+    // Sostituisci loadView con questa versione:
+async function loadView(view) {
+    if (view === 'dashboard')  loadDashboard();
+    if (view === 'componenti') loadComponenti();
+    if (view === 'magazzino')  loadMovimenti();
+    if (view === 'esperienze') loadEsperienze();
+    if (view === 'acquisti')   loadAcquisti();
+    if (view === 'utenti')     loadUtenti();
+    if (view === 'famiglie')   loadFamiglie();
+    if (view === 'locazioni')  loadLocazioni();
+}
 
     /* ── PROFILE ── */
     async function loadProfile() {
@@ -1668,9 +1832,19 @@
 
     /* ── MODALS ── */
     function openModal(name) {
-      document.getElementById('modal-' + name).classList.add('open');
-      if (name === 'addMov') populateCompSelect();
+    document.getElementById('modal-' + name).classList.add('open');
+    if (name === 'addMov') populateCompSelect();
+    if (name === 'addComp') populateAddCompSelects();
+    if (name === 'addFam') {
+        populateFamigliaSelect('af-parent');
+        document.getElementById('af-nome').value = '';
     }
+    if (name === 'addLoc') {
+        document.getElementById('al-ambiente').value = '';
+        document.getElementById('al-sezione').value = '';
+        document.getElementById('al-cassetto').value = '';
+    }
+}
 
     function closeModal(name) {
       document.getElementById('modal-' + name).classList.remove('open');
@@ -1685,17 +1859,61 @@
       sel.innerHTML = allComponents.map(c => `<option value="${c.id}">${c.nome}</option>`).join('');
     }
 
-    async function salvaComponente() {
-      const body = {
-        nome: document.getElementById('c-nome').value,
-        quantita: parseInt(document.getElementById('c-qty').value),
-        quantita_minima: parseInt(document.getElementById('c-qtymin').value),
-        link_datasheet: document.getElementById('c-ds').value,
-      };
-      await apiFetch(`${API}/componenti/`, { method: 'POST', body: JSON.stringify(body) });
-      closeModal('addComp');
-      loadComponenti();
+    async function populateAddCompSelects() {
+    // Carica famiglie e locazioni se non ancora disponibili
+    if (!famiglie.length) {
+        const res = await apiFetch(`${API}/famiglie/`);
+        famiglie = await res.json();
     }
+    if (!locazioni.length) {
+        const res = await apiFetch(`${API}/locazioni/`);
+        locazioni = await res.json();
+    }
+
+    document.getElementById('c-famiglia').innerHTML =
+        '<option value="">— Nessuna —</option>' +
+        famiglie.map(f => `<option value="${f.id}">${f.nome}</option>`).join('');
+
+    document.getElementById('c-locazione').innerHTML =
+        '<option value="">— Nessuna —</option>' +
+        locazioni.map(l => `<option value="${l.id}">${l.ambiente} / ${l.sezione} / ${l.cassetto}</option>`).join('');
+
+    // Reset altri campi
+    document.getElementById('c-nome').value = '';
+    document.getElementById('c-qty').value = 0;
+    document.getElementById('c-qtymin').value = 0;
+    document.getElementById('c-ds').value = '';
+}
+
+    async function salvaComponente() {
+    const nome = document.getElementById('c-nome').value.trim();
+    if (!nome) { showToast('Inserisci un nome.', 'err'); return; }
+
+    const famiglia  = document.getElementById('c-famiglia').value;
+    const locazione = document.getElementById('c-locazione').value;
+
+    const body = {
+        nome,
+        quantita:         parseInt(document.getElementById('c-qty').value),
+        quantita_minima:  parseInt(document.getElementById('c-qtymin').value),
+        link_datasheet:   document.getElementById('c-ds').value.trim(),
+        famiglia:         famiglia  ? parseInt(famiglia)  : null,
+        locazione:        locazione ? parseInt(locazione) : null,
+    };
+
+    try {
+        const res = await apiFetch(`${API}/componenti/`, {
+            method: 'POST',
+            body: JSON.stringify(body)
+        });
+        if (!res.ok) throw new Error();
+        closeModal('addComp');
+        showToast('Componente aggiunto!', 'ok');
+        loadComponenti();
+    } catch {
+        showToast('Errore durante il salvataggio.', 'err');
+    }
+}
 
     async function salvaMovimento() {
       const body = {
@@ -1727,6 +1945,198 @@
     document.querySelectorAll('.overlay').forEach(o => {
       o.addEventListener('click', e => { if (e.target === o) o.classList.remove('open'); });
     });
+
+    /* ── FAMIGLIE ── */
+async function loadFamiglie() {
+    document.getElementById('fam-loader').style.display = 'block';
+    document.getElementById('fam-table').style.display = 'none';
+    try {
+        const res = await apiFetch(`${API}/famiglie/`);
+        famiglie = await res.json();
+        const tbody = document.getElementById('fam-tbody');
+        tbody.innerHTML = famiglie.length === 0
+            ? '<tr><td colspan="3" style="text-align:center;color:var(--muted);padding:24px">Nessuna famiglia</td></tr>'
+            : famiglie.map(f => `
+                <tr>
+                    <td><strong>${f.nome}</strong></td>
+                    <td>${famiglie.find(p => p.id === f.parent)?.nome ?? '—'}</td>
+                    <td style="display:flex;gap:0.5rem">
+                        <button class="btn-edit" onclick="openEditFamiglia(${f.id})">✏ Modifica</button>
+                        <button class="btn-edit" style="color:var(--danger);border-color:rgba(224,92,92,0.3);background:rgba(224,92,92,0.08)"
+                            onclick="eliminaFamiglia(${f.id}, '${f.nome.replace(/'/g, "\\'")}')">🗑</button>
+                    </td>
+                </tr>`).join('');
+        document.getElementById('fam-loader').style.display = 'none';
+        document.getElementById('fam-table').style.display = '';
+    } catch {
+        document.getElementById('fam-loader').innerHTML = '⚠️ Errore nel caricamento.';
+    }
+}
+
+function populateFamigliaSelect(selectId, selectedId = null) {
+    const sel = document.getElementById(selectId);
+    sel.innerHTML = '<option value="">— Nessuna —</option>' +
+        famiglie.map(f => `<option value="${f.id}" ${f.id === selectedId ? 'selected' : ''}>${f.nome}</option>`).join('');
+}
+
+async function openModal_addFam() {
+    if (!famiglie.length) await loadFamiglie();
+    populateFamigliaSelect('af-parent');
+    document.getElementById('af-nome').value = '';
+    openModal('addFam');
+}
+
+async function salvaFamiglia() {
+    const nome = document.getElementById('af-nome').value.trim();
+    const parent = document.getElementById('af-parent').value;
+    if (!nome) { showToast('Inserisci un nome.', 'err'); return; }
+    try {
+        const res = await apiFetch(`${API}/famiglie/`, {
+            method: 'POST',
+            body: JSON.stringify({ nome, parent: parent || null })
+        });
+        if (!res.ok) throw new Error();
+        closeModal('addFam');
+        showToast('Famiglia aggiunta!', 'ok');
+        loadFamiglie();
+    } catch {
+        showToast('Errore durante il salvataggio.', 'err');
+    }
+}
+
+async function openEditFamiglia(id) {
+    const f = famiglie.find(x => x.id === id);
+    if (!f) return;
+    document.getElementById('ef-id').value = f.id;
+    document.getElementById('ef-nome').value = f.nome;
+    // Escludi la famiglia stessa dal parent per evitare cicli
+    const sel = document.getElementById('ef-parent');
+    sel.innerHTML = '<option value="">— Nessuna —</option>' +
+        famiglie.filter(x => x.id !== id).map(x =>
+            `<option value="${x.id}" ${x.id === f.parent ? 'selected' : ''}>${x.nome}</option>`
+        ).join('');
+    openModal('editFam');
+}
+
+async function salvaModificaFamiglia() {
+    const id = document.getElementById('ef-id').value;
+    const nome = document.getElementById('ef-nome').value.trim();
+    const parent = document.getElementById('ef-parent').value;
+    if (!nome) { showToast('Inserisci un nome.', 'err'); return; }
+    try {
+        const res = await apiFetch(`${API}/famiglie/${id}/`, {
+            method: 'PATCH',
+            body: JSON.stringify({ nome, parent: parent || null })
+        });
+        if (!res.ok) throw new Error();
+        closeModal('editFam');
+        showToast('Famiglia aggiornata!', 'ok');
+        loadFamiglie();
+    } catch {
+        showToast('Errore durante il salvataggio.', 'err');
+    }
+}
+
+async function eliminaFamiglia(id, nome) {
+    if (!confirm(`Eliminare la famiglia "${nome}"? I componenti associati perderanno la famiglia.`)) return;
+    try {
+        const res = await apiFetch(`${API}/famiglie/${id}/`, { method: 'DELETE' });
+        if (!res.ok) throw new Error();
+        showToast('Famiglia eliminata.', 'ok');
+        loadFamiglie();
+    } catch {
+        showToast('Errore durante l\'eliminazione.', 'err');
+    }
+}
+
+/* ── LOCAZIONI ── */
+async function loadLocazioni() {
+    document.getElementById('loc-loader').style.display = 'block';
+    document.getElementById('loc-table').style.display = 'none';
+    try {
+        const res = await apiFetch(`${API}/locazioni/`);
+        locazioni = await res.json();
+        const tbody = document.getElementById('loc-tbody');
+        tbody.innerHTML = locazioni.length === 0
+            ? '<tr><td colspan="4" style="text-align:center;color:var(--muted);padding:24px">Nessuna locazione</td></tr>'
+            : locazioni.map(l => `
+                <tr>
+                    <td>${l.ambiente}</td>
+                    <td>${l.sezione}</td>
+                    <td>${l.cassetto}</td>
+                    <td style="display:flex;gap:0.5rem">
+                        <button class="btn-edit" onclick="openEditLocazione(${l.id})">✏ Modifica</button>
+                        <button class="btn-edit" style="color:var(--danger);border-color:rgba(224,92,92,0.3);background:rgba(224,92,92,0.08)"
+                            onclick="eliminaLocazione(${l.id})">🗑</button>
+                    </td>
+                </tr>`).join('');
+        document.getElementById('loc-loader').style.display = 'none';
+        document.getElementById('loc-table').style.display = '';
+    } catch {
+        document.getElementById('loc-loader').innerHTML = '⚠️ Errore nel caricamento.';
+    }
+}
+
+async function salvaLocazione() {
+    const ambiente = document.getElementById('al-ambiente').value.trim();
+    const sezione  = document.getElementById('al-sezione').value.trim();
+    const cassetto = document.getElementById('al-cassetto').value.trim();
+    if (!ambiente || !sezione || !cassetto) { showToast('Compila tutti i campi.', 'err'); return; }
+    try {
+        const res = await apiFetch(`${API}/locazioni/`, {
+            method: 'POST',
+            body: JSON.stringify({ ambiente, sezione, cassetto })
+        });
+        if (!res.ok) throw new Error();
+        closeModal('addLoc');
+        showToast('Locazione aggiunta!', 'ok');
+        loadLocazioni();
+    } catch {
+        showToast('Errore durante il salvataggio.', 'err');
+    }
+}
+
+function openEditLocazione(id) {
+    const l = locazioni.find(x => x.id === id);
+    if (!l) return;
+    document.getElementById('el-id').value = l.id;
+    document.getElementById('el-ambiente').value = l.ambiente;
+    document.getElementById('el-sezione').value = l.sezione;
+    document.getElementById('el-cassetto').value = l.cassetto;
+    openModal('editLoc');
+}
+
+async function salvaModificaLocazione() {
+    const id       = document.getElementById('el-id').value;
+    const ambiente = document.getElementById('el-ambiente').value.trim();
+    const sezione  = document.getElementById('el-sezione').value.trim();
+    const cassetto = document.getElementById('el-cassetto').value.trim();
+    if (!ambiente || !sezione || !cassetto) { showToast('Compila tutti i campi.', 'err'); return; }
+    try {
+        const res = await apiFetch(`${API}/locazioni/${id}/`, {
+            method: 'PATCH',
+            body: JSON.stringify({ ambiente, sezione, cassetto })
+        });
+        if (!res.ok) throw new Error();
+        closeModal('editLoc');
+        showToast('Locazione aggiornata!', 'ok');
+        loadLocazioni();
+    } catch {
+        showToast('Errore durante il salvataggio.', 'err');
+    }
+}
+
+async function eliminaLocazione(id) {
+    if (!confirm('Eliminare questa locazione? I componenti associati perderanno la posizione.')) return;
+    try {
+        const res = await apiFetch(`${API}/locazioni/${id}/`, { method: 'DELETE' });
+        if (!res.ok) throw new Error();
+        showToast('Locazione eliminata.', 'ok');
+        loadLocazioni();
+    } catch {
+        showToast('Errore durante l\'eliminazione.', 'err');
+    }
+}
 
     /* ── INIT ── */
     (async () => {
