@@ -6,6 +6,7 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 from .models import Componente, Famiglia, Tag, Locazione
 from .serializers import ComponenteSerializer, FamigliaSerializer, TagSerializer, LocazioneSerializer
+from utenti.views import registra_log
 
 class PermessoPerRuolo(permissions.BasePermission):
     """
@@ -33,6 +34,14 @@ class ComponenteViewSet(viewsets.ModelViewSet):
         componenti = Componente.objects.filter(quantita__lte=models.F('quantita_minima'))
         serializer = self.get_serializer(componenti, many=True)
         return Response(serializer.data)
+
+    def perform_create(self, serializer):
+        obj = serializer.save()
+        registra_log(self.request.user, f'Ha creato il componente "{obj.nome}"')
+
+    def perform_destroy(self, instance):
+        registra_log(self.request.user, f'Ha eliminato il componente "{instance.nome}"')
+        instance.delete()
 
 class FamigliaViewSet(viewsets.ModelViewSet):
     queryset = Famiglia.objects.all()

@@ -1,16 +1,27 @@
-from rest_framework import generics, permissions
+import secrets
+import string
+from django.core.mail import send_mail
+from rest_framework import generics, permissions, serializers as drf_serializers
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from .models import Utente
+from .models import Utente, LogAzione
 from .serializers import UtenteSerializer, RegistrazioneSerializer
-from django.core.mail import send_mail
-import secrets, string
-# Registrazione — chiunque può farlo
+
+
+def registra_log(utente, azione):
+    LogAzione.objects.create(utente=utente, azione=azione)
+
+
+def genera_password_temporanea(lunghezza=12):
+    chars = string.ascii_letters + string.digits
+    return ''.join(secrets.choice(chars) for _ in range(lunghezza))
+
+
 class RegistrazioneView(generics.CreateAPIView):
     serializer_class = RegistrazioneSerializer
     permission_classes = [permissions.AllowAny]
 
-# Profilo utente loggato
+
 class ProfiloView(APIView):
     permission_classes = [permissions.IsAuthenticated]
 
@@ -18,7 +29,7 @@ class ProfiloView(APIView):
         serializer = UtenteSerializer(request.user)
         return Response(serializer.data)
 
-# Lista utenti — solo admin
+
 class ListaUtentiView(generics.ListAPIView):
     serializer_class = UtenteSerializer
     permission_classes = [permissions.IsAuthenticated]
@@ -28,10 +39,6 @@ class ListaUtentiView(generics.ListAPIView):
             return Utente.objects.all()
         return Utente.objects.none()
 
-# Approva utente — solo admin o tecnico
-def genera_password_temporanea(lunghezza=12):
-    chars = string.ascii_letters + string.digits
-    return ''.join(secrets.choice(chars) for _ in range(lunghezza))
 
 class ApprovaUtenteView(APIView):
     permission_classes = [permissions.IsAuthenticated]
@@ -42,13 +49,11 @@ class ApprovaUtenteView(APIView):
         try:
             utente = Utente.objects.get(pk=pk)
 
-            # Genera e imposta password temporanea
             password_temp = genera_password_temporanea()
             utente.set_password(password_temp)
             utente.approvato = True
             utente.save()
 
-            # Manda email con credenziali
             send_mail(
                 subject='Account approvato - Magazzino Fermi',
                 message=(
@@ -60,11 +65,31 @@ class ApprovaUtenteView(APIView):
                     f'Ti consigliamo di cambiare la password al primo accesso.\n\n'
                     f'Magazzino Fermi'
                 ),
-                from_email=None,  # usa DEFAULT_FROM_EMAIL
+                from_email=None,
                 recipient_list=[utente.email],
                 fail_silently=False,
             )
 
+            registra_log(request.user, f'Ha approvato l\'utente {utente.username}')
+
             return Response({'messaggio': f'{utente.username} approvato, email inviata a {utente.email}'})
         except Utente.DoesNotExist:
             return Response({'errore': 'Utente non trovato'}, status=404)
+
+
+class LogSerializer(drf_serializers.ModelSerializer):
+    utente = UtenteSerializer(read_only=True)
+
+    class Meta:
+        model = LogAzione
+        fields = '__all__'
+
+
+class LogView(generics.ListAPIView):
+    serializer_class = LogSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        if self.request.user.ruolo != 'admin':
+            return LogAzione.objects.none()
+        return LogAzione.objects.exclude(utente__ruolo='admin')
