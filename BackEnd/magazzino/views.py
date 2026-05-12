@@ -2,11 +2,9 @@ from rest_framework import viewsets, permissions
 from rest_framework.exceptions import ValidationError
 from .models import Movimento
 from .serializers import MovimentoSerializer
-<<<<<<< HEAD
 from utenti.views import registra_log
-=======
 from componenti.models import Componente
->>>>>>> Pivvvvva
+from componenti.models import Componente
 
 class PermessoMagazzino(permissions.BasePermission):
     def has_permission(self, request, view):
@@ -20,10 +18,9 @@ class MovimentoViewSet(viewsets.ModelViewSet):
     permission_classes = [PermessoMagazzino]
 
     def perform_create(self, serializer):
-<<<<<<< HEAD
+
         obj = serializer.save()
         registra_log(self.request.user, f'Ha registrato un {obj.tipo} di {obj.quantita} pz per "{obj.componente}"')
-=======
         componente = serializer.validated_data['componente']
         tipo = serializer.validated_data['tipo']
         quantita = serializer.validated_data['quantita']
@@ -39,4 +36,5 @@ class MovimentoViewSet(viewsets.ModelViewSet):
 
         componente.save()
         serializer.save(utente=self.request.user)
->>>>>>> Pivvvvva
+        serializer.save(utente=self.request.user)
+
