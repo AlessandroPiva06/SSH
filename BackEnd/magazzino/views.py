@@ -1,20 +1,42 @@
 from rest_framework import viewsets, permissions
+from rest_framework.exceptions import ValidationError
 from .models import Movimento
 from .serializers import MovimentoSerializer
+<<<<<<< HEAD
 from utenti.views import registra_log
+=======
+from componenti.models import Componente
+>>>>>>> Pivvvvva
 
 class PermessoMagazzino(permissions.BasePermission):
     def has_permission(self, request, view):
         if not request.user.is_authenticated:
             return False
-        # Solo admin e tecnico possono fare carico/scarico
         return request.user.ruolo in ['admin', 'tecnico']
 
 class MovimentoViewSet(viewsets.ModelViewSet):
-    queryset = Movimento.objects.all()
+    queryset = Movimento.objects.all().order_by('-timestamp')
     serializer_class = MovimentoSerializer
     permission_classes = [PermessoMagazzino]
 
     def perform_create(self, serializer):
+<<<<<<< HEAD
         obj = serializer.save()
         registra_log(self.request.user, f'Ha registrato un {obj.tipo} di {obj.quantita} pz per "{obj.componente}"')
+=======
+        componente = serializer.validated_data['componente']
+        tipo = serializer.validated_data['tipo']
+        quantita = serializer.validated_data['quantita']
+
+        if tipo == 'scarico':
+            if componente.quantita < quantita:
+                raise ValidationError(
+                    f'Quantità insufficiente: disponibili {componente.quantita}, richiesti {quantita}.'
+                )
+            componente.quantita -= quantita
+        else:
+            componente.quantita += quantita
+
+        componente.save()
+        serializer.save(utente=self.request.user)
+>>>>>>> Pivvvvva
