@@ -619,6 +619,8 @@
     .modal input[type="text"],
     .modal input[type="number"],
     .modal input[type="url"],
+    .modal input[type="email"],
+    .modal input[type="password"],
     .modal select {
       width: 100%;
       padding: 10px 14px;
@@ -660,14 +662,19 @@
       cursor: pointer;
       transition: all 0.15s;
       color: var(--muted);
+      user-select: none;
     }
+
+    .tag-check:active { transform: scale(0.93); }
 
     .tag-check input { display: none; }
 
     .tag-check.selected {
-      background: rgba(232,184,109,0.12);
-      border-color: rgba(232,184,109,0.4);
+      background: rgba(232,184,109,0.18);
+      border-color: rgba(232,184,109,0.6);
       color: var(--accent);
+      font-weight: 600;
+      box-shadow: 0 0 0 2px rgba(232,184,109,0.15);
     }
 
     .scorta-toggle {
@@ -768,6 +775,9 @@
 <a class="nav-link admin-only" style="display:none" onclick="showView('locazioni')">
     <span class="icon">📍</span> Locazioni
 </a>
+<a class="nav-link admin-only" style="display:none" onclick="showView('tags')">
+    <span class="icon">🏷️</span> Tag
+</a>
 
       <div class="nav-section">Liste</div>
       <a class="nav-link" onclick="showView('esperienze')">
@@ -784,13 +794,13 @@
     </nav>
 
     <div class="sidebar-footer">
-      <div class="user-badge">
+      <div class="user-badge" onclick="openModal('profilo')" title="Modifica profilo" style="cursor:pointer">
         <div class="user-avatar" id="userAvatar">?</div>
         <div class="user-info">
           <div class="user-name" id="userName">Caricamento…</div>
           <div class="user-role" id="userRole">—</div>
         </div>
-        <button class="logout-btn" onclick="logout()" title="Esci">⏻</button>
+        <button class="logout-btn" onclick="event.stopPropagation(); logout()" title="Esci">⏻</button>
       </div>
     </div>
   </aside>
@@ -981,6 +991,23 @@
     </div>
 </div>
 
+<!-- TAG -->
+<div class="view" id="view-tags">
+    <div class="table-header">
+        <div class="table-title">Tag</div>
+        <button class="btn btn-primary" onclick="openModal('addTag')">+ Aggiungi</button>
+    </div>
+    <div class="table-wrap">
+        <div class="loader" id="tag-loader"><div class="spinner"></div><br>Caricamento…</div>
+        <table id="tag-table" style="display:none">
+            <thead><tr>
+                <th>Nome</th><th>Componenti associati</th><th>Azioni</th>
+            </tr></thead>
+            <tbody id="tag-tbody"></tbody>
+        </table>
+    </div>
+</div>
+
 <!-- LOCAZIONI -->
 <div class="view" id="view-locazioni">
     <div class="table-header">
@@ -1123,7 +1150,7 @@
         </div>
       </div>
 
-      <div class="field">
+      <div class="field" id="e-tags-field">
         <label>Tag</label>
         <div class="tags-grid" id="e-tags-wrap"></div>
       </div>
@@ -1262,6 +1289,86 @@
     </div>
 </div>
 
+<!-- MODAL NUOVO TAG -->
+<div class="overlay" id="modal-addTag">
+    <div class="modal">
+        <h3>Nuovo Tag</h3>
+        <div class="field">
+            <label>Nome</label>
+            <input type="text" id="at-nome" placeholder="es. SMD, THT, 5V...">
+        </div>
+        <div class="modal-actions">
+            <button class="btn btn-primary" onclick="salvaTag()">Salva</button>
+            <button class="btn btn-ghost" onclick="closeModal('addTag')">Annulla</button>
+        </div>
+    </div>
+</div>
+
+<!-- MODAL MODIFICA TAG -->
+<div class="overlay" id="modal-editTag">
+    <div class="modal">
+        <h3>Modifica Tag</h3>
+        <input type="hidden" id="et-id">
+        <div class="field">
+            <label>Nome</label>
+            <input type="text" id="et-nome">
+        </div>
+        <div class="modal-actions">
+            <button class="btn btn-primary" onclick="salvaModificaTag()">Salva modifiche</button>
+            <button class="btn btn-ghost" onclick="closeModal('editTag')">Annulla</button>
+        </div>
+    </div>
+</div>
+
+<!-- MODAL PROFILO -->
+<div class="overlay" id="modal-profilo">
+  <div class="modal" style="max-width:420px">
+    <div style="display:flex;align-items:center;gap:12px;margin-bottom:1.5rem">
+      <div style="width:48px;height:48px;border-radius:50%;background:var(--accent);color:#1a1f2e;display:flex;align-items:center;justify-content:center;font-size:1.4rem;font-weight:700" id="p-avatar-preview">?</div>
+      <div>
+        <div style="font-size:1.1rem;font-weight:600" id="p-name-preview">—</div>
+        <div style="font-size:0.8rem;color:var(--muted)" id="p-role-preview">—</div>
+      </div>
+    </div>
+
+    <div id="profilo-error" class="error-box" style="display:none;margin-bottom:1rem"></div>
+
+    <div style="display:flex;flex-direction:column;gap:0.75rem">
+      <div class="field" style="margin:0">
+        <label>Username</label>
+        <input type="text" id="p-username" autocomplete="username">
+      </div>
+      <div class="field" style="margin:0">
+        <label>Email</label>
+        <input type="email" id="p-email" autocomplete="email">
+      </div>
+    </div>
+
+    <div style="margin:1.25rem 0 0.75rem;padding-top:1rem;border-top:1px solid var(--border)">
+      <div style="font-size:0.78rem;color:var(--muted);font-weight:600;letter-spacing:.04em;text-transform:uppercase;margin-bottom:0.75rem">Cambia password</div>
+      <div style="display:flex;flex-direction:column;gap:0.75rem">
+        <div class="field" style="margin:0">
+          <label>Password attuale</label>
+          <input type="password" id="p-old-password" autocomplete="current-password" placeholder="Richiesta solo se cambi password">
+        </div>
+        <div class="field" style="margin:0">
+          <label>Nuova password</label>
+          <input type="password" id="p-password" autocomplete="new-password" placeholder="Lascia vuoto per non cambiarla">
+        </div>
+        <div class="field" style="margin:0">
+          <label>Conferma nuova password</label>
+          <input type="password" id="p-password2" autocomplete="new-password" placeholder="••••••••">
+        </div>
+      </div>
+    </div>
+
+    <div class="modal-actions" style="margin-top:1.25rem">
+      <button class="btn btn-primary" onclick="salvaProfilo()">Salva modifiche</button>
+      <button class="btn btn-ghost" onclick="closeModal('profilo')">Annulla</button>
+    </div>
+  </div>
+</div>
+
   <div id="toast"></div>
 
   <script>
@@ -1270,6 +1377,7 @@
     let allComponents = [];
     let famiglie = [], locazioni = [], allTags = [];
     let scorteState = false;
+    let currentUserRuolo = '';
 
     // ── FILTER STATE ──
     const filterState = {
@@ -1283,7 +1391,7 @@
 
     /* ── AUTH ── */
     function authHeaders() {
-      const token = localStorage.getItem('access');
+      const token = sessionStorage.getItem('access');
       if (!token) { window.location.href = 'LogIn.html'; return {}; }
       return { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' };
     }
@@ -1296,8 +1404,8 @@
     }
 
     function logout() {
-      localStorage.removeItem('access');
-      localStorage.removeItem('refresh');
+      sessionStorage.removeItem('access');
+      sessionStorage.removeItem('refresh');
       window.location.href = '/login/';
     }
 
@@ -1316,7 +1424,7 @@ const titles = {
     dashboard: 'Dashboard', componenti: 'Componenti',
     magazzino: 'Movimenti', esperienze: 'Esperienze',
     acquisti: 'Acquisti', utenti: 'Utenti',
-    famiglie: 'Famiglie', locazioni: 'Locazioni'   // ← aggiungi questi
+    famiglie: 'Famiglie', locazioni: 'Locazioni', tags: 'Tag'
 };
       document.getElementById('pageTitle').textContent = titles[view] || view;
       document.getElementById('compControls').style.display = view === 'componenti' ? 'flex' : 'none';
@@ -1334,6 +1442,7 @@ async function loadView(view) {
     if (view === 'utenti')     loadUtenti();
     if (view === 'famiglie')   loadFamiglie();
     if (view === 'locazioni')  loadLocazioni();
+    if (view === 'tags')       loadTags();
 }
 
     /* ── PROFILE ── */
@@ -1345,6 +1454,7 @@ async function loadView(view) {
         document.getElementById('userName').textContent = u.username;
         document.getElementById('userRole').textContent = u.ruolo;
         document.getElementById('userAvatar').textContent = u.username[0].toUpperCase();
+        currentUserRuolo = u.ruolo;
         if (['admin','tecnico'].includes(u.ruolo)) {
           document.getElementById('adminSection').style.display = '';
           document.querySelectorAll('.admin-only').forEach(el => el.style.display = '');
@@ -1438,9 +1548,9 @@ async function loadView(view) {
         if (filterState.sottoScorta && c.quantita > c.quantita_minima) return false;
         if (filterState.isScorta && !c.is_scorta) return false;
         if (filterState.tags.size > 0) {
-          const compTags = c.tag || [];
+          const compTagIds = (c.tag || []).map(t => t.id);
           for (const tid of filterState.tags) {
-            if (!compTags.includes(tid)) return false;
+            if (!compTagIds.includes(tid)) return false;
           }
         }
         return true;
@@ -1616,7 +1726,7 @@ async function loadView(view) {
             <button class="btn-edit" onclick="openEditModal(${c.id})">✏ Modifica</button>
           </td>
            <td>
-            <button class="btn-edit" style="color:var(--danger);border-color:rgba(224,92,92,0.3);background:rgba(224,92,92,0.08)" onclick="eliminaComponente(${c.id}, '${c.nome.replace(/'/g, "\\'")}')">🗑</button>
+            ${['admin','tecnico'].includes(currentUserRuolo) ? `<button class="btn-edit" style="color:var(--danger);border-color:rgba(224,92,92,0.3);background:rgba(224,92,92,0.08)" onclick="eliminaComponente(${c.id}, '${c.nome.replace(/'/g, "\\'")}')">🗑</button>` : ''}
           </td>
         </tr>`).join('');
     }
@@ -1643,14 +1753,17 @@ async function loadView(view) {
       lSel.innerHTML = '<option value="">— Nessuna —</option>' +
         locazioni.map(l => `<option value="${l.id}" ${comp.locazione == l.id ? 'selected' : ''}>${l.ambiente} / ${l.sezione} / ${l.cassetto}</option>`).join('');
 
-      const compTags = comp.tag || [];
+      const compTagIds = (comp.tag || []).map(t => t.id);
       const wrap = document.getElementById('e-tags-wrap');
+      const tagsField = document.getElementById('e-tags-field');
+      const isProfessore = currentUserRuolo === 'professore';
+      tagsField.style.display = isProfessore ? 'none' : '';
       if (allTags.length === 0) {
         wrap.innerHTML = '<span style="color:var(--muted);font-size:0.82rem">Nessun tag disponibile</span>';
       } else {
         wrap.innerHTML = allTags.map(t => {
-          const sel = compTags.includes(t.id);
-          return `<label class="tag-check ${sel ? 'selected' : ''}" id="tag-${t.id}" onclick="toggleTag(this, ${t.id})">
+          const sel = compTagIds.includes(t.id);
+          return `<label class="tag-check ${sel ? 'selected' : ''}" id="tag-${t.id}" onclick="toggleTag(this, event)">
             <input type="checkbox" value="${t.id}" ${sel ? 'checked' : ''}> ${t.nome}
           </label>`;
         }).join('');
@@ -1673,7 +1786,8 @@ async function loadView(view) {
 }
 
 
-    function toggleTag(el) {
+    function toggleTag(el, event) {
+      event.preventDefault();
       el.classList.toggle('selected');
       const cb = el.querySelector('input');
       cb.checked = !cb.checked;
@@ -1709,7 +1823,7 @@ async function loadView(view) {
         is_scorta: scorteState,
         famiglia: famigliaVal ? parseInt(famigliaVal) : null,
         locazione: locazioneVal ? parseInt(locazioneVal) : null,
-        tag: selectedTags,
+        tag_ids: selectedTags,
       };
 
       if (!body.nome) {
@@ -1844,6 +1958,7 @@ async function loadView(view) {
         document.getElementById('al-sezione').value = '';
         document.getElementById('al-cassetto').value = '';
     }
+    if (name === 'profilo') openProfiloModal();
 }
 
     function closeModal(name) {
@@ -2133,6 +2248,168 @@ async function eliminaLocazione(id) {
         if (!res.ok) throw new Error();
         showToast('Locazione eliminata.', 'ok');
         loadLocazioni();
+    } catch {
+        showToast('Errore durante l\'eliminazione.', 'err');
+    }
+}
+
+/* ── PROFILO ── */
+    function openProfiloModal() {
+      document.getElementById('p-old-password').value = '';
+      document.getElementById('p-password').value = '';
+      document.getElementById('p-password2').value = '';
+      document.getElementById('profilo-error').style.display = 'none';
+      apiFetch(`${API}/auth/profilo/`).then(r => r.json()).then(u => {
+        document.getElementById('p-username').value = u.username || '';
+        document.getElementById('p-email').value = u.email || '';
+        document.getElementById('p-avatar-preview').textContent = (u.username || '?')[0].toUpperCase();
+        document.getElementById('p-name-preview').textContent = u.username || '—';
+        document.getElementById('p-role-preview').textContent = u.ruolo || '—';
+      });
+    }
+
+    async function salvaProfilo() {
+      const errBox = document.getElementById('profilo-error');
+      errBox.style.display = 'none';
+
+      const username   = document.getElementById('p-username').value.trim();
+      const email      = document.getElementById('p-email').value.trim();
+      const oldPw      = document.getElementById('p-old-password').value;
+      const pw1        = document.getElementById('p-password').value;
+      const pw2        = document.getElementById('p-password2').value;
+
+      if (!username) {
+        errBox.textContent = 'Username obbligatorio.';
+        errBox.style.display = 'block'; return;
+      }
+      if (pw1 || pw2 || oldPw) {
+        if (!oldPw) {
+          errBox.textContent = 'Inserisci la password attuale per cambiarla.';
+          errBox.style.display = 'block'; return;
+        }
+        if (!pw1) {
+          errBox.textContent = 'Inserisci la nuova password.';
+          errBox.style.display = 'block'; return;
+        }
+        if (pw1 !== pw2) {
+          errBox.textContent = 'Le nuove password non coincidono.';
+          errBox.style.display = 'block'; return;
+        }
+      }
+
+      const body = { username, email };
+      if (pw1) { body.password = pw1; body.vecchia_password = oldPw; }
+
+      try {
+        const res = await apiFetch(`${API}/auth/profilo/`, {
+          method: 'PATCH',
+          body: JSON.stringify(body)
+        });
+        if (!res.ok) {
+          const err = await res.json();
+          errBox.textContent = Object.values(err).flat().join(' ');
+          errBox.style.display = 'block'; return;
+        }
+        const u = await res.json();
+        document.getElementById('userName').textContent = u.username;
+        document.getElementById('userAvatar').textContent = u.username[0].toUpperCase();
+        closeModal('profilo');
+        showToast('Profilo aggiornato!', 'ok');
+      } catch {
+        errBox.textContent = 'Errore durante il salvataggio.';
+        errBox.style.display = 'block';
+      }
+    }
+
+/* ── TAG ── */
+async function loadTags() {
+    document.getElementById('tag-loader').style.display = 'block';
+    document.getElementById('tag-table').style.display = 'none';
+    try {
+        const [tags, comps] = await Promise.all([
+            apiFetch(`${API}/tag/`).then(r => r.json()),
+            apiFetch(`${API}/componenti/`).then(r => r.json()),
+        ]);
+        allTags = tags;
+        const tbody = document.getElementById('tag-tbody');
+        tbody.innerHTML = tags.length === 0
+            ? '<tr><td colspan="3" style="text-align:center;color:var(--muted);padding:24px">Nessun tag</td></tr>'
+            : tags.map(t => {
+                const count = comps.filter(c => (c.tag || []).some(ct => ct.id === t.id)).length;
+                return `<tr>
+                    <td><span class="badge badge-neutral" style="font-size:0.85rem">${t.nome}</span></td>
+                    <td style="color:var(--muted)">${count} componente${count !== 1 ? 'i' : ''}</td>
+                    <td style="display:flex;gap:0.5rem">
+                        <button class="btn-edit" onclick="openEditTag(${t.id}, '${t.nome.replace(/'/g, "\\'")}')">✏ Modifica</button>
+                        <button class="btn-edit" style="color:var(--danger);border-color:rgba(224,92,92,0.3);background:rgba(224,92,92,0.08)"
+                            onclick="eliminaTag(${t.id}, '${t.nome.replace(/'/g, "\\'")}')">🗑</button>
+                    </td>
+                </tr>`;
+            }).join('');
+        document.getElementById('tag-loader').style.display = 'none';
+        document.getElementById('tag-table').style.display = '';
+    } catch {
+        document.getElementById('tag-loader').innerHTML = '⚠️ Errore nel caricamento.';
+    }
+}
+
+async function salvaTag() {
+    const nome = document.getElementById('at-nome').value.trim();
+    if (!nome) { showToast('Inserisci un nome.', 'err'); return; }
+    try {
+        const res = await apiFetch(`${API}/tag/`, {
+            method: 'POST',
+            body: JSON.stringify({ nome })
+        });
+        if (!res.ok) {
+            const err = await res.json();
+            showToast(err.nome?.[0] || 'Errore durante il salvataggio.', 'err');
+            return;
+        }
+        closeModal('addTag');
+        document.getElementById('at-nome').value = '';
+        showToast('Tag aggiunto!', 'ok');
+        loadTags();
+    } catch {
+        showToast('Errore durante il salvataggio.', 'err');
+    }
+}
+
+function openEditTag(id, nome) {
+    document.getElementById('et-id').value = id;
+    document.getElementById('et-nome').value = nome;
+    openModal('editTag');
+}
+
+async function salvaModificaTag() {
+    const id   = document.getElementById('et-id').value;
+    const nome = document.getElementById('et-nome').value.trim();
+    if (!nome) { showToast('Inserisci un nome.', 'err'); return; }
+    try {
+        const res = await apiFetch(`${API}/tag/${id}/`, {
+            method: 'PATCH',
+            body: JSON.stringify({ nome })
+        });
+        if (!res.ok) {
+            const err = await res.json();
+            showToast(err.nome?.[0] || 'Errore durante il salvataggio.', 'err');
+            return;
+        }
+        closeModal('editTag');
+        showToast('Tag aggiornato!', 'ok');
+        loadTags();
+    } catch {
+        showToast('Errore durante il salvataggio.', 'err');
+    }
+}
+
+async function eliminaTag(id, nome) {
+    if (!confirm(`Eliminare il tag "${nome}"? Verrà rimosso da tutti i componenti associati.`)) return;
+    try {
+        const res = await apiFetch(`${API}/tag/${id}/`, { method: 'DELETE' });
+        if (!res.ok) throw new Error();
+        showToast('Tag eliminato.', 'ok');
+        loadTags();
     } catch {
         showToast('Errore durante l\'eliminazione.', 'err');
     }
