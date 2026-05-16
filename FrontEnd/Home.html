@@ -619,6 +619,8 @@
     .modal input[type="text"],
     .modal input[type="number"],
     .modal input[type="url"],
+    .modal input[type="email"],
+    .modal input[type="password"],
     .modal select {
       width: 100%;
       padding: 10px 14px;
@@ -1320,26 +1322,47 @@
 
 <!-- MODAL PROFILO -->
 <div class="overlay" id="modal-profilo">
-  <div class="modal">
-    <h3>Il tuo profilo</h3>
-    <div id="profilo-error" class="error-box" style="display:none"></div>
-    <div class="field">
-      <label>Username</label>
-      <input type="text" id="p-username">
+  <div class="modal" style="max-width:420px">
+    <div style="display:flex;align-items:center;gap:12px;margin-bottom:1.5rem">
+      <div style="width:48px;height:48px;border-radius:50%;background:var(--accent);color:#1a1f2e;display:flex;align-items:center;justify-content:center;font-size:1.4rem;font-weight:700" id="p-avatar-preview">?</div>
+      <div>
+        <div style="font-size:1.1rem;font-weight:600" id="p-name-preview">—</div>
+        <div style="font-size:0.8rem;color:var(--muted)" id="p-role-preview">—</div>
+      </div>
     </div>
-    <div class="field">
-      <label>Email</label>
-      <input type="email" id="p-email">
+
+    <div id="profilo-error" class="error-box" style="display:none;margin-bottom:1rem"></div>
+
+    <div style="display:flex;flex-direction:column;gap:0.75rem">
+      <div class="field" style="margin:0">
+        <label>Username</label>
+        <input type="text" id="p-username" autocomplete="username">
+      </div>
+      <div class="field" style="margin:0">
+        <label>Email</label>
+        <input type="email" id="p-email" autocomplete="email">
+      </div>
     </div>
-    <div class="field">
-      <label>Nuova password <span style="color:var(--muted);font-size:0.8rem">(lascia vuoto per non cambiarla)</span></label>
-      <input type="password" id="p-password" placeholder="••••••••">
+
+    <div style="margin:1.25rem 0 0.75rem;padding-top:1rem;border-top:1px solid var(--border)">
+      <div style="font-size:0.78rem;color:var(--muted);font-weight:600;letter-spacing:.04em;text-transform:uppercase;margin-bottom:0.75rem">Cambia password</div>
+      <div style="display:flex;flex-direction:column;gap:0.75rem">
+        <div class="field" style="margin:0">
+          <label>Password attuale</label>
+          <input type="password" id="p-old-password" autocomplete="current-password" placeholder="Richiesta solo se cambi password">
+        </div>
+        <div class="field" style="margin:0">
+          <label>Nuova password</label>
+          <input type="password" id="p-password" autocomplete="new-password" placeholder="Lascia vuoto per non cambiarla">
+        </div>
+        <div class="field" style="margin:0">
+          <label>Conferma nuova password</label>
+          <input type="password" id="p-password2" autocomplete="new-password" placeholder="••••••••">
+        </div>
+      </div>
     </div>
-    <div class="field">
-      <label>Conferma nuova password</label>
-      <input type="password" id="p-password2" placeholder="••••••••">
-    </div>
-    <div class="modal-actions">
+
+    <div class="modal-actions" style="margin-top:1.25rem">
       <button class="btn btn-primary" onclick="salvaProfilo()">Salva modifiche</button>
       <button class="btn btn-ghost" onclick="closeModal('profilo')">Annulla</button>
     </div>
@@ -1368,7 +1391,7 @@
 
     /* ── AUTH ── */
     function authHeaders() {
-      const token = localStorage.getItem('access');
+      const token = sessionStorage.getItem('access');
       if (!token) { window.location.href = 'LogIn.html'; return {}; }
       return { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' };
     }
@@ -1381,8 +1404,8 @@
     }
 
     function logout() {
-      localStorage.removeItem('access');
-      localStorage.removeItem('refresh');
+      sessionStorage.removeItem('access');
+      sessionStorage.removeItem('refresh');
       window.location.href = 'LogIn.html';
     }
 
@@ -2232,14 +2255,16 @@ async function eliminaLocazione(id) {
 
 /* ── PROFILO ── */
     function openProfiloModal() {
-      document.getElementById('p-username').value = document.getElementById('userName').textContent;
-      document.getElementById('p-email').value = '';
+      document.getElementById('p-old-password').value = '';
       document.getElementById('p-password').value = '';
       document.getElementById('p-password2').value = '';
       document.getElementById('profilo-error').style.display = 'none';
-      // carica email attuale
-      apiFetch(`${API_AUTH}/profilo/`).then(r => r.json()).then(u => {
+      apiFetch(`${API}/auth/profilo/`).then(r => r.json()).then(u => {
+        document.getElementById('p-username').value = u.username || '';
         document.getElementById('p-email').value = u.email || '';
+        document.getElementById('p-avatar-preview').textContent = (u.username || '?')[0].toUpperCase();
+        document.getElementById('p-name-preview').textContent = u.username || '—';
+        document.getElementById('p-role-preview').textContent = u.ruolo || '—';
       });
     }
 
@@ -2247,27 +2272,43 @@ async function eliminaLocazione(id) {
       const errBox = document.getElementById('profilo-error');
       errBox.style.display = 'none';
 
-      const username = document.getElementById('p-username').value.trim();
-      const email    = document.getElementById('p-email').value.trim();
-      const pw1      = document.getElementById('p-password').value;
-      const pw2      = document.getElementById('p-password2').value;
+      const username   = document.getElementById('p-username').value.trim();
+      const email      = document.getElementById('p-email').value.trim();
+      const oldPw      = document.getElementById('p-old-password').value;
+      const pw1        = document.getElementById('p-password').value;
+      const pw2        = document.getElementById('p-password2').value;
 
-      if (!username) { errBox.textContent = 'Username obbligatorio.'; errBox.style.display = 'block'; return; }
-      if (pw1 && pw1 !== pw2) { errBox.textContent = 'Le password non coincidono.'; errBox.style.display = 'block'; return; }
+      if (!username) {
+        errBox.textContent = 'Username obbligatorio.';
+        errBox.style.display = 'block'; return;
+      }
+      if (pw1 || pw2 || oldPw) {
+        if (!oldPw) {
+          errBox.textContent = 'Inserisci la password attuale per cambiarla.';
+          errBox.style.display = 'block'; return;
+        }
+        if (!pw1) {
+          errBox.textContent = 'Inserisci la nuova password.';
+          errBox.style.display = 'block'; return;
+        }
+        if (pw1 !== pw2) {
+          errBox.textContent = 'Le nuove password non coincidono.';
+          errBox.style.display = 'block'; return;
+        }
+      }
 
       const body = { username, email };
-      if (pw1) body.password = pw1;
+      if (pw1) { body.password = pw1; body.vecchia_password = oldPw; }
 
       try {
-        const res = await apiFetch(`${API_AUTH}/profilo/`, {
+        const res = await apiFetch(`${API}/auth/profilo/`, {
           method: 'PATCH',
           body: JSON.stringify(body)
         });
         if (!res.ok) {
           const err = await res.json();
           errBox.textContent = Object.values(err).flat().join(' ');
-          errBox.style.display = 'block';
-          return;
+          errBox.style.display = 'block'; return;
         }
         const u = await res.json();
         document.getElementById('userName').textContent = u.username;

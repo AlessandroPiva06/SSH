@@ -3,3 +3,5 @@ __pycache__/
 *.pyc
 BackEnd/.env
 db.sq lite3
+*.venv
+*.env
