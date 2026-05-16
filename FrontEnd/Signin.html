@@ -236,7 +236,7 @@
     <button type="submit" id="btn" onclick="registra()">Crea account</button>
 
     <div class="links">
-      <p>Hai già un account? <a href="LogIn.html">Accedi</a></p>
+      <p>Hai già un account? <a href="/login/">Accedi</a>
     </div>
   </div>
 
@@ -284,7 +284,7 @@
         } else {
           ok.textContent = '✓ Account creato! Attendi l\'approvazione di un admin.';
           ok.classList.add('show');
-          setTimeout(() => window.location.href = 'LogIn.html', 2500);
+          setTimeout(() => window.location.href = '/login/', 2500);
         }
       } catch {
         err.textContent = 'Errore di connessione al server.';
