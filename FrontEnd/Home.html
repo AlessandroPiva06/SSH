@@ -792,13 +792,13 @@
     </nav>
 
     <div class="sidebar-footer">
-      <div class="user-badge">
+      <div class="user-badge" onclick="openModal('profilo')" title="Modifica profilo" style="cursor:pointer">
         <div class="user-avatar" id="userAvatar">?</div>
         <div class="user-info">
           <div class="user-name" id="userName">Caricamento…</div>
           <div class="user-role" id="userRole">—</div>
         </div>
-        <button class="logout-btn" onclick="logout()" title="Esci">⏻</button>
+        <button class="logout-btn" onclick="event.stopPropagation(); logout()" title="Esci">⏻</button>
       </div>
     </div>
   </aside>
@@ -1318,6 +1318,34 @@
     </div>
 </div>
 
+<!-- MODAL PROFILO -->
+<div class="overlay" id="modal-profilo">
+  <div class="modal">
+    <h3>Il tuo profilo</h3>
+    <div id="profilo-error" class="error-box" style="display:none"></div>
+    <div class="field">
+      <label>Username</label>
+      <input type="text" id="p-username">
+    </div>
+    <div class="field">
+      <label>Email</label>
+      <input type="email" id="p-email">
+    </div>
+    <div class="field">
+      <label>Nuova password <span style="color:var(--muted);font-size:0.8rem">(lascia vuoto per non cambiarla)</span></label>
+      <input type="password" id="p-password" placeholder="••••••••">
+    </div>
+    <div class="field">
+      <label>Conferma nuova password</label>
+      <input type="password" id="p-password2" placeholder="••••••••">
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-primary" onclick="salvaProfilo()">Salva modifiche</button>
+      <button class="btn btn-ghost" onclick="closeModal('profilo')">Annulla</button>
+    </div>
+  </div>
+</div>
+
   <div id="toast"></div>
 
   <script>
@@ -1340,7 +1368,7 @@
 
     /* ── AUTH ── */
     function authHeaders() {
-      const token = sessionStorage.getItem('access');
+      const token = localStorage.getItem('access');
       if (!token) { window.location.href = 'LogIn.html'; return {}; }
       return { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' };
     }
@@ -1353,8 +1381,8 @@
     }
 
     function logout() {
-      sessionStorage.removeItem('access');
-      sessionStorage.removeItem('refresh');
+      localStorage.removeItem('access');
+      localStorage.removeItem('refresh');
       window.location.href = 'LogIn.html';
     }
 
@@ -1907,6 +1935,7 @@ async function loadView(view) {
         document.getElementById('al-sezione').value = '';
         document.getElementById('al-cassetto').value = '';
     }
+    if (name === 'profilo') openProfiloModal();
 }
 
     function closeModal(name) {
@@ -2200,6 +2229,56 @@ async function eliminaLocazione(id) {
         showToast('Errore durante l\'eliminazione.', 'err');
     }
 }
+
+/* ── PROFILO ── */
+    function openProfiloModal() {
+      document.getElementById('p-username').value = document.getElementById('userName').textContent;
+      document.getElementById('p-email').value = '';
+      document.getElementById('p-password').value = '';
+      document.getElementById('p-password2').value = '';
+      document.getElementById('profilo-error').style.display = 'none';
+      // carica email attuale
+      apiFetch(`${API_AUTH}/profilo/`).then(r => r.json()).then(u => {
+        document.getElementById('p-email').value = u.email || '';
+      });
+    }
+
+    async function salvaProfilo() {
+      const errBox = document.getElementById('profilo-error');
+      errBox.style.display = 'none';
+
+      const username = document.getElementById('p-username').value.trim();
+      const email    = document.getElementById('p-email').value.trim();
+      const pw1      = document.getElementById('p-password').value;
+      const pw2      = document.getElementById('p-password2').value;
+
+      if (!username) { errBox.textContent = 'Username obbligatorio.'; errBox.style.display = 'block'; return; }
+      if (pw1 && pw1 !== pw2) { errBox.textContent = 'Le password non coincidono.'; errBox.style.display = 'block'; return; }
+
+      const body = { username, email };
+      if (pw1) body.password = pw1;
+
+      try {
+        const res = await apiFetch(`${API_AUTH}/profilo/`, {
+          method: 'PATCH',
+          body: JSON.stringify(body)
+        });
+        if (!res.ok) {
+          const err = await res.json();
+          errBox.textContent = Object.values(err).flat().join(' ');
+          errBox.style.display = 'block';
+          return;
+        }
+        const u = await res.json();
+        document.getElementById('userName').textContent = u.username;
+        document.getElementById('userAvatar').textContent = u.username[0].toUpperCase();
+        closeModal('profilo');
+        showToast('Profilo aggiornato!', 'ok');
+      } catch {
+        errBox.textContent = 'Errore durante il salvataggio.';
+        errBox.style.display = 'block';
+      }
+    }
 
 /* ── TAG ── */
 async function loadTags() {
