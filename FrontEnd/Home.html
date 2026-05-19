@@ -1106,6 +1106,12 @@
             <label>Link datasheet</label>
             <input id="c-ds" type="url" placeholder="https://…">
         </div>
+        <div class="field">
+    <label>Tag</label>
+    <div class="tags-grid" id="c-tags-wrap"></div>
+</div>
+
+<div class="modal-actions">
         <div class="modal-actions">
             <button class="btn btn-primary" onclick="salvaComponente()">Salva</button>
             <button class="btn btn-ghost" onclick="closeModal('addComp')">Annulla</button>
@@ -1152,7 +1158,14 @@
 
       <div class="field" id="e-tags-field">
         <label>Tag</label>
-        <div class="tags-grid" id="e-tags-wrap"></div>
+        <div class="tags-grid" id="e-tags-wrap">
+            : allTags.map(t => {
+    const sel = compTags.includes(t.id);
+    return `<label class="tag-check ${sel ? 'selected' : ''}" onclick="toggleTag(this, event)">
+        <input type="checkbox" value="${t.id}" ${sel ? 'checked' : ''}> ${t.nome}
+    </label>`;
+}).join('');
+        </div>
       </div>
 
       <div class="field">
@@ -1984,6 +1997,15 @@ async function loadView(view) {
         const res = await apiFetch(`${API}/locazioni/`);
         locazioni = await res.json();
     }
+    // dopo aver popolato famiglia e locazione
+    const wrap = document.getElementById('c-tags-wrap');
+    wrap.innerHTML = allTags.length === 0
+    ? '<span style="color:var(--muted);font-size:0.82rem">Nessun tag disponibile</span>'
+    : allTags.map(t =>
+    `<label class="tag-check" onclick="toggleTag(this, event)">
+        <input type="checkbox" value="${t.id}"> ${t.nome}
+    </label>`
+).join('');
 
     document.getElementById('c-famiglia').innerHTML =
         '<option value="">— Nessuna —</option>' +
@@ -2006,6 +2028,7 @@ async function loadView(view) {
 
     const famiglia  = document.getElementById('c-famiglia').value;
     const locazione = document.getElementById('c-locazione').value;
+    const selectedTags = [...document.querySelectorAll('#c-tags-wrap input:checked')].map(i => parseInt(i.value));
 
     const body = {
         nome,
@@ -2014,6 +2037,7 @@ async function loadView(view) {
         link_datasheet:   document.getElementById('c-ds').value.trim(),
         famiglia:         famiglia  ? parseInt(famiglia)  : null,
         locazione:        locazione ? parseInt(locazione) : null,
+        tag_ids:              selectedTags,
     };
 
     try {
@@ -2024,7 +2048,7 @@ async function loadView(view) {
         if (!res.ok) throw new Error();
         closeModal('addComp');
         showToast('Componente aggiunto!', 'ok');
-        loadComponenti();
+        await loadComponenti();
     } catch {
         showToast('Errore durante il salvataggio.', 'err');
     }
