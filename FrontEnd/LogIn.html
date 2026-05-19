@@ -236,7 +236,7 @@
         const data = await res.json();
         sessionStorage.setItem('access', data.access);
         sessionStorage.setItem('refresh', data.refresh);
-        window.location.href = '/';
+        window.location.href = '/Home.html';
 
       } catch {
         err.classList.add('show');
