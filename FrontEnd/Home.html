@@ -1158,14 +1158,8 @@
 
       <div class="field" id="e-tags-field">
         <label>Tag</label>
-        <div class="tags-grid" id="e-tags-wrap">
-            : allTags.map(t => {
-    const sel = compTags.includes(t.id);
-    return `<label class="tag-check ${sel ? 'selected' : ''}" onclick="toggleTag(this, event)">
-        <input type="checkbox" value="${t.id}" ${sel ? 'checked' : ''}> ${t.nome}
-    </label>`;
-}).join('');
-        </div>
+        <!-- Svuotato il contenitore: verrà popolato via JS -->
+        <div class="tags-grid" id="e-tags-wrap"></div>
       </div>
 
       <div class="field">
@@ -1182,7 +1176,8 @@
 
       <div class="modal-actions">
         <button class="btn btn-primary" onclick="salvaModifica()">Salva modifiche</button>
-        <button class="btn btn-ghost" onclick="closeModal('editComp')">Annulla</button>
+        <!-- Corretto l'ID passato a closeModal per farlo corrispondere a modal-editComp -->
+        <button class="btn btn-ghost" onclick="closeModal('modal-editComp')">Annulla</button>
       </div>
     </div>
   </div>

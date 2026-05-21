@@ -77,7 +77,7 @@ DATABASES = {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'magazzino_fermi',
         'USER': 'root',
-        'PASSWORD': os.environ.get('DB_PASSWORD', 'password'),
+        'PASSWORD': os.environ.get('DB_PASSWORD', 'Pivotto06'),
         'HOST': '127.0.0.1',   # su Windows '127.0.0.1' è più affidabile di 'localhost'
         'PORT': '3306',
         'OPTIONS': {
