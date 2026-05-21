@@ -1406,14 +1406,14 @@
     async function apiFetch(url, opts = {}) {
       opts.headers = { ...authHeaders(), ...(opts.headers || {}) };
       const res = await fetch(url, opts);
-      if (res.status === 401) { window.location.href = '/login'; }
+      if (res.status === 401) { window.location.href = 'LogIn.html'; }
       return res;
     }
 
     function logout() {
       sessionStorage.removeItem('access');
       sessionStorage.removeItem('refresh');
-      window.location.href = '/login';
+      window.location.href = '/LogIn.html';
     }
 
     /* ── NAV ── */

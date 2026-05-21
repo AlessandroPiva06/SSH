@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Magazzino Fermi — Accedi</title>
+  <title>Magazzino Fermi — Registrazione</title>
   <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -17,6 +17,7 @@
       --text: #e8e9ef;
       --muted: #7a7f96;
       --error: #e05c5c;
+      --success: #5cb85c;
     }
 
     body {
@@ -31,7 +32,6 @@
       overflow: hidden;
     }
 
-    /* Decorative background grid */
     body::before {
       content: '';
       position: fixed;
@@ -43,13 +43,12 @@
       pointer-events: none;
     }
 
-    /* Glowing orb */
     body::after {
       content: '';
       position: fixed;
-      top: -200px; right: -200px;
+      bottom: -200px; left: -200px;
       width: 600px; height: 600px;
-      background: radial-gradient(circle, rgba(232,184,109,0.08) 0%, transparent 70%);
+      background: radial-gradient(circle, rgba(232,184,109,0.06) 0%, transparent 70%);
       pointer-events: none;
     }
 
@@ -57,9 +56,9 @@
       background: var(--card);
       border: 1px solid var(--border);
       border-radius: 16px;
-      padding: 48px 44px;
+      padding: 44px;
       width: 100%;
-      max-width: 420px;
+      max-width: 440px;
       position: relative;
       z-index: 1;
       box-shadow: 0 24px 64px rgba(0,0,0,0.5);
@@ -75,7 +74,7 @@
       display: flex;
       align-items: center;
       gap: 12px;
-      margin-bottom: 36px;
+      margin-bottom: 32px;
     }
 
     .logo-icon {
@@ -89,67 +88,66 @@
     .logo-text {
       font-family: 'DM Serif Display', serif;
       font-size: 1.4rem;
-      color: var(--text);
       line-height: 1.1;
     }
-
     .logo-text span { color: var(--accent); }
 
     h2 {
       font-family: 'DM Serif Display', serif;
-      font-size: 1.8rem;
-      color: var(--text);
+      font-size: 1.7rem;
       margin-bottom: 6px;
     }
 
     .subtitle {
       color: var(--muted);
-      font-size: 0.9rem;
-      margin-bottom: 32px;
+      font-size: 0.88rem;
+      margin-bottom: 28px;
+      line-height: 1.5;
     }
 
-    .field { margin-bottom: 20px; }
+    .field { margin-bottom: 16px; }
 
     label {
       display: block;
-      font-size: 0.82rem;
+      font-size: 0.8rem;
       font-weight: 600;
       color: var(--muted);
       text-transform: uppercase;
       letter-spacing: 0.08em;
-      margin-bottom: 8px;
+      margin-bottom: 7px;
     }
 
-    input {
+    input, select {
       width: 100%;
-      padding: 12px 16px;
+      padding: 11px 15px;
       background: var(--bg);
       border: 1px solid var(--border);
       border-radius: 8px;
       color: var(--text);
       font-family: 'DM Sans', sans-serif;
-      font-size: 0.95rem;
+      font-size: 0.93rem;
       transition: border-color 0.2s, box-shadow 0.2s;
     }
 
-    input:focus {
+    select option { background: var(--card); }
+
+    input:focus, select:focus {
       outline: none;
       border-color: var(--accent);
       box-shadow: 0 0 0 3px rgba(232,184,109,0.12);
     }
 
-    .error-msg {
+    .msg {
       display: none;
-      background: rgba(224,92,92,0.1);
-      border: 1px solid rgba(224,92,92,0.3);
-      color: var(--error);
       border-radius: 8px;
       padding: 10px 14px;
       font-size: 0.88rem;
-      margin-bottom: 20px;
+      margin-bottom: 16px;
     }
 
-    .error-msg.show { display: block; }
+    .msg.error  { background: rgba(224,92,92,0.1); border: 1px solid rgba(224,92,92,0.3); color: var(--error); }
+    .msg.success{ background: rgba(92,184,92,0.1); border: 1px solid rgba(92,184,92,0.3); color: var(--success); }
+    .msg.show   { display: block; }
 
     button[type="submit"] {
       width: 100%;
@@ -164,7 +162,6 @@
       cursor: pointer;
       transition: background 0.2s, transform 0.1s;
       margin-top: 8px;
-      letter-spacing: 0.02em;
     }
 
     button[type="submit"]:hover { background: var(--accent2); }
@@ -173,13 +170,24 @@
 
     .links {
       text-align: center;
-      margin-top: 24px;
+      margin-top: 20px;
       font-size: 0.88rem;
       color: var(--muted);
     }
 
     .links a { color: var(--accent); text-decoration: none; }
     .links a:hover { text-decoration: underline; }
+
+    .info-box {
+      background: rgba(232,184,109,0.06);
+      border: 1px solid rgba(232,184,109,0.2);
+      border-radius: 8px;
+      padding: 10px 14px;
+      font-size: 0.83rem;
+      color: var(--muted);
+      margin-bottom: 20px;
+      line-height: 1.5;
+    }
   </style>
 </head>
 <body>
@@ -189,64 +197,103 @@
       <div class="logo-text">Magazzino<br><span>Fermi</span></div>
     </div>
 
-    <h2>Bentornato</h2>
-    <p class="subtitle">Accedi al sistema di gestione componenti</p>
+    <h2>Crea account</h2>
+    <p class="subtitle">Il tuo account dovrà essere approvato da un admin prima di poter accedere.</p>
 
-    <div class="error-msg" id="error">Credenziali non valide. Riprova.</div>
+    <div class="info-box">ℹ️ Dopo la registrazione attendi l'approvazione del tecnico o amministratore.</div>
+
+    <div id="errMsg" class="msg error"></div>
+    <div id="okMsg"  class="msg success"></div>
 
     <div class="field">
       <label for="username">Username</label>
-      <input type="text" id="username" autocomplete="username" placeholder="es. mario.rossi">
+      <input type="text" id="username" placeholder="es. mario.rossi">
+    </div>
+
+    <div class="field">
+      <label for="email">Email</label>
+      <input type="email" id="email" placeholder="nome@scuola.it">
+    </div>
+
+    <div class="field">
+      <label for="ruolo">Ruolo</label>
+      <select id="ruolo">
+        <option value="professore">Professore</option>
+        <option value="tecnico">Tecnico</option>
+      </select>
     </div>
 
     <div class="field">
       <label for="password">Password</label>
-      <input type="password" id="password" autocomplete="current-password" placeholder="••••••••">
+      <input type="password" id="password" placeholder="••••••••">
     </div>
 
-    <button type="submit" id="btn" onclick="login()">Accedi</button>
+    <div class="field">
+      <label for="confirm">Conferma Password</label>
+      <input type="password" id="confirm" placeholder="••••••••">
+    </div>
+
+    <button type="submit" id="btn" onclick="registra()">Crea account</button>
 
     <div class="links">
-      <p>Non hai un account? <a href="/registrazione/">Registrati</a>
+      <p>Hai già un account? <a href="/login/">Accedi</a>
     </div>
   </div>
 
   <script>
     const API = 'http://localhost:8000/api/auth';
 
-    async function login() {
+    async function registra() {
       const username = document.getElementById('username').value.trim();
+      const email    = document.getElementById('email').value.trim();
+      const ruolo    = document.getElementById('ruolo').value;
       const password = document.getElementById('password').value;
+      const confirm  = document.getElementById('confirm').value;
       const btn = document.getElementById('btn');
-      const err = document.getElementById('error');
+      const err = document.getElementById('errMsg');
+      const ok  = document.getElementById('okMsg');
 
       err.classList.remove('show');
+      ok.classList.remove('show');
+
+      if (!username || !email || !password) {
+        err.textContent = 'Compila tutti i campi obbligatori.';
+        return err.classList.add('show');
+      }
+      if (password !== confirm) {
+        err.textContent = 'Le password non coincidono.';
+        return err.classList.add('show');
+      }
+
       btn.disabled = true;
-      btn.textContent = 'Accesso in corso…';
+      btn.textContent = 'Registrazione in corso…';
 
       try {
-        const res = await fetch(`${API}/login/`, {
+        const res = await fetch(`${API}/registrazione/`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ username, password })
+          body: JSON.stringify({ username, email, password, ruolo })
         });
 
-        if (!res.ok) throw new Error();
-
         const data = await res.json();
-        sessionStorage.setItem('access', data.access);
-        sessionStorage.setItem('refresh', data.refresh);
-        window.location.href = '/';
 
+        if (!res.ok) {
+          const msgs = Object.values(data).flat().join(' ');
+          err.textContent = msgs || 'Errore durante la registrazione.';
+          err.classList.add('show');
+        } else {
+          ok.textContent = '✓ Account creato! Attendi l\'approvazione di un admin.';
+          ok.classList.add('show');
+          setTimeout(() => window.location.href = '/login/', 2500);
+        }
       } catch {
+        err.textContent = 'Errore di connessione al server.';
         err.classList.add('show');
-        btn.disabled = false;
-        btn.textContent = 'Accedi';
       }
-    }
 
-    // Enter key support
-    document.addEventListener('keydown', e => { if (e.key === 'Enter') login(); });
+      btn.disabled = false;
+      btn.textContent = 'Crea account';
+    }
   </script>
 </body>
 </html>
