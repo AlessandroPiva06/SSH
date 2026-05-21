@@ -1112,7 +1112,6 @@
 </div>
 
 <div class="modal-actions">
-        <div class="modal-actions">
             <button class="btn btn-primary" onclick="salvaComponente()">Salva</button>
             <button class="btn btn-ghost" onclick="closeModal('addComp')">Annulla</button>
         </div>
@@ -1177,7 +1176,7 @@
       <div class="modal-actions">
         <button class="btn btn-primary" onclick="salvaModifica()">Salva modifiche</button>
         <!-- Corretto l'ID passato a closeModal per farlo corrispondere a modal-editComp -->
-        <button class="btn btn-ghost" onclick="closeModal('modal-editComp')">Annulla</button>
+        <button class="btn btn-ghost" onclick="closeModal('editComp')">Annulla</button>
       </div>
     </div>
   </div>
@@ -1975,11 +1974,18 @@ async function loadView(view) {
 
     async function populateCompSelect() {
       const sel = document.getElementById('m-comp');
-      if (!allComponents.length) {
-        const res = await apiFetch(`${API}/componenti/`);
-        allComponents = await res.json();
+      try {
+        if (!allComponents.length) {
+          const res = await apiFetch(`${API}/componenti/`);
+          allComponents = await res.json();
+        }
+        sel.innerHTML = allComponents.length
+          ? allComponents.map(c => `<option value="${c.id}">${c.nome}</option>`).join('')
+          : '<option value="">Nessun componente disponibile</option>';
+      } catch {
+        sel.innerHTML = '<option value="">\u26a0\ufe0f Errore nel caricamento</option>';
+        showToast('Errore nel caricamento dei componenti.', 'err');
       }
-      sel.innerHTML = allComponents.map(c => `<option value="${c.id}">${c.nome}</option>`).join('');
     }
 
     async function populateAddCompSelects() {
