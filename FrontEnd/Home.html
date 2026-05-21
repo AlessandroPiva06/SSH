@@ -1041,17 +1041,18 @@
 
       <!-- ACQUISTI -->
       <div class="view" id="view-acquisti">
-        <div class="table-header">
-          <div class="table-title">Liste Acquisti</div>
-        </div>
-        <div class="table-wrap">
-          <div class="loader" id="acq-loader"><div class="spinner"></div><br>Caricamento…</div>
-          <table id="acq-table" style="display:none">
-            <thead><tr><th>ID</th><th>Creata il</th><th>Creata da</th></tr></thead>
-            <tbody id="acq-tbody"></tbody>
-          </table>
-        </div>
-      </div>
+  <div class="table-header">
+    <div class="table-title">Liste Acquisti</div>
+    <button class="btn btn-primary" onclick="openModal('addAcq')">+ Nuova lista</button>
+  </div>
+  <div class="table-wrap">
+    <div class="loader" id="acq-loader"><div class="spinner"></div><br>Caricamento…</div>
+    <table id="acq-table" style="display:none">
+      <thead><tr><th>ID</th><th>Creata il</th><th>Creata da</th><th>Azioni</th></tr></thead>
+      <tbody id="acq-tbody"></tbody>
+    </table>
+  </div>
+</div>
 
       <!-- UTENTI -->
       <div class="view" id="view-utenti">
@@ -1116,6 +1117,71 @@
             <button class="btn btn-ghost" onclick="closeModal('addComp')">Annulla</button>
         </div>
     </div>
+</div>
+
+<div class="overlay" id="modal-esperienza">
+  <div class="modal" style="max-width:600px">
+    <h3 id="esp-modal-titolo"></h3>
+    <table style="width:100%; margin-top:1rem; border-collapse:collapse">
+      <thead>
+        <tr>
+          <th style="text-align:left;padding:8px;font-size:0.75rem;color:var(--muted)">Componente</th>
+          <th style="text-align:left;padding:8px;font-size:0.75rem;color:var(--muted)">Necessari</th>
+          <th style="text-align:left;padding:8px;font-size:0.75rem;color:var(--muted)">Disponibili</th>
+          <th style="text-align:left;padding:8px;font-size:0.75rem;color:var(--muted)">Stato</th>
+        </tr>
+      </thead>
+      <tbody id="esp-modal-tbody"></tbody>
+    </table>
+    <div class="modal-actions" style="margin-top:1.5rem; flex-direction:column; gap:12px">
+  <div style="display:flex; gap:8px; width:100%">
+    <select id="esp-add-comp" style="flex:1; background:var(--surface2); border:1px solid var(--border); border-radius:8px; color:var(--text); padding:8px 12px; font-family:'DM Sans',sans-serif"></select>
+    <input id="esp-add-qty" type="number" min="1" value="1" style="width:70px; background:var(--surface2); border:1px solid var(--border); border-radius:8px; color:var(--text); padding:8px; text-align:center">
+    <button class="btn btn-primary" style="white-space:nowrap" onclick="aggiungiComponenteEsperienza()">+ Aggiungi</button>
+  </div>
+  <button class="btn btn-ghost" style="width:100%" onclick="closeModal('esperienza')">Chiudi</button>
+    </div>
+  </div>
+</div>
+
+<!--MODAL NUOVA LISTA ACQUISTI -->
+  <div class="overlay" id="modal-addAcq">
+  <div class="modal" style="max-width:400px">
+    <h3>Nuova Lista Acquisti</h3>
+    <p style="color:var(--muted);font-size:0.85rem;margin-top:8px">Verrà creata una lista vuota a cui potrai aggiungere componenti.</p>
+    <div class="modal-actions" style="margin-top:1.5rem">
+      <button class="btn btn-primary" onclick="creaListaAcquisti()">Crea</button>
+      <button class="btn btn-ghost" onclick="closeModal('addAcq')">Annulla</button>
+    </div>
+  </div>
+</div>
+
+  <!--MODAL DETTAGLIO LISTA ACQUISTI -->
+  <div class="overlay" id="modal-acquisto">
+  <div class="modal" style="max-width:600px">
+    <h3 id="acq-modal-titolo"></h3>
+    <table style="width:100%; margin-top:1rem; border-collapse:collapse">
+      <thead>
+        <tr>
+          <th style="text-align:left;padding:8px;font-size:0.75rem;color:var(--muted)">Componente</th>
+          <th style="text-align:left;padding:8px;font-size:0.75rem;color:var(--muted)">Quantità</th>
+          <th style="text-align:left;padding:8px;font-size:0.75rem;color:var(--muted)">Azioni</th>
+        </tr>
+      </thead>
+      <tbody id="acq-modal-tbody"></tbody>
+    </table>
+    <div class="modal-actions" style="margin-top:1.5rem; flex-direction:column; gap:12px">
+      <div style="display:flex; gap:8px; width:100%">
+        <select id="acq-add-comp" style="flex:1; background:var(--surface2); border:1px solid var(--border); border-radius:8px; color:var(--text); padding:8px 12px; font-family:'DM Sans',sans-serif"></select>
+        <input id="acq-add-qty" type="number" min="1" value="1" style="width:70px; background:var(--surface2); border:1px solid var(--border); border-radius:8px; color:var(--text); padding:8px; text-align:center">
+        <button class="btn btn-primary" style="white-space:nowrap" onclick="aggiungiComponenteAcquisto()">+ Aggiungi</button>
+      </div>
+      <div style="display:flex; gap:8px; width:100%">
+        <button class="btn btn-primary" style="flex:1" onclick="esportaCSV()">⬇ Esporta CSV</button>
+        <button class="btn btn-ghost" style="flex:1" onclick="closeModal('acquisto')">Chiudi</button>
+      </div>
+    </div>
+  </div>
 </div>
 
   <!-- ── MODAL MODIFICA COMPONENTE ── -->
@@ -1891,10 +1957,10 @@ async function loadView(view) {
         const res = await apiFetch(`${API}/esperienze/`);
         const list = await res.json();
         document.getElementById('esp-tbody').innerHTML = list.map(e => `
-          <tr>
-            <td>${e.nome}</td>
-            <td>${new Date(e.creata_il).toLocaleDateString('it-IT')}</td>
-          </tr>`).join('') || '<tr><td colspan="2" style="text-align:center;color:var(--muted);padding:24px">Nessuna lista</td></tr>';
+  <tr style="cursor:pointer" onclick="openEsperienza(${e.id})">
+    <td>${e.nome}</td>
+    <td>${new Date(e.creata_il).toLocaleDateString('it-IT')}</td>
+  </tr>`).join('') || '<tr><td colspan="2" style="text-align:center;color:var(--muted);padding:24px">Nessuna lista</td></tr>';
         document.getElementById('esp-loader').style.display = 'none';
         document.getElementById('esp-table').style.display = '';
       } catch {
@@ -1902,25 +1968,171 @@ async function loadView(view) {
       }
     }
 
+
+   let currentEsperienzaId = null;
+
+async function openEsperienza(id) {
+  currentEsperienzaId = id;
+  const res = await apiFetch(`${API}/esperienze/${id}/`);
+  const esp = await res.json();
+
+  const righe = esp.voci.length === 0
+    ? '<tr><td colspan="4" style="text-align:center;color:var(--muted);padding:24px">Nessun componente in lista</td></tr>'
+    : esp.voci.map(v => {
+        const disponibile = v.componente_quantita >= v.quantita_necessaria;
+        return `<tr>
+          <td>${v.componente_nome}</td>
+          <td>${v.quantita_necessaria}</td>
+          <td>${v.componente_quantita}</td>
+          <td><span class="badge ${disponibile ? 'badge-ok' : 'badge-warn'}">
+            ${disponibile ? '✓ Disponibile' : '✗ Mancante'}
+          </span></td>
+        </tr>`;
+      }).join('');
+
+  document.getElementById('esp-modal-titolo').textContent = esp.nome;
+  document.getElementById('esp-modal-tbody').innerHTML = righe;
+
+  if (!allComponents.length) {
+    const r = await apiFetch(`${API}/componenti/`);
+    allComponents = await r.json();
+  }
+  document.getElementById('esp-add-comp').innerHTML = allComponents.map(c =>
+    `<option value="${c.id}">${c.nome}</option>`
+  ).join('');
+
+  document.getElementById('modal-esperienza').classList.add('open');
+}
+
+async function aggiungiComponenteEsperienza() {
+  const compId = document.getElementById('esp-add-comp').value;
+  const qty = document.getElementById('esp-add-qty').value;
+
+  const res = await apiFetch(`${API}/esperienze/${currentEsperienzaId}/aggiungi_componente/`, {
+    method: 'POST',
+    body: JSON.stringify({ componente: compId, quantita_necessaria: qty })
+  });
+
+  if (res.ok) {
+    showToast('Componente aggiunto!', 'ok');
+    openEsperienza(currentEsperienzaId);
+  } else {
+    showToast('Errore durante l\'aggiunta.', 'err');
+  }
+}
+
+
     /* ── ACQUISTI ── */
-    async function loadAcquisti() {
-      document.getElementById('acq-loader').style.display = 'block';
-      document.getElementById('acq-table').style.display = 'none';
-      try {
-        const res = await apiFetch(`${API}/acquisti/`);
-        const list = await res.json();
-        document.getElementById('acq-tbody').innerHTML = list.map(a => `
-          <tr>
-            <td>#${a.id}</td>
-            <td>${new Date(a.creata_il).toLocaleDateString('it-IT')}</td>
-            <td>${a.creata_da ?? '—'}</td>
-          </tr>`).join('') || '<tr><td colspan="3" style="text-align:center;color:var(--muted);padding:24px">Nessuna lista</td></tr>';
-        document.getElementById('acq-loader').style.display = 'none';
-        document.getElementById('acq-table').style.display = '';
-      } catch {
-        document.getElementById('acq-loader').innerHTML = '⚠️ Errore.';
-      }
-    }
+    let currentAcquistoId = null;
+
+async function loadAcquisti() {
+  document.getElementById('acq-loader').style.display = 'block';
+  document.getElementById('acq-table').style.display = 'none';
+  try {
+    const res = await apiFetch(`${API}/acquisti/`);
+    const list = await res.json();
+    document.getElementById('acq-tbody').innerHTML = list.map(a => `
+      <tr style="cursor:pointer">
+        <td onclick="openAcquisto(${a.id})">#${a.id}</td>
+        <td onclick="openAcquisto(${a.id})">${new Date(a.creata_il).toLocaleDateString('it-IT')}</td>
+        <td onclick="openAcquisto(${a.id})">${a.creata_da_username ?? '—'}</td>
+        <td><button class="btn btn-ghost" style="padding:4px 10px;font-size:0.78rem;color:var(--danger)" onclick="eliminaAcquisto(${a.id})">Elimina</button></td>
+      </tr>`).join('') || '<tr><td colspan="4" style="text-align:center;color:var(--muted);padding:24px">Nessuna lista</td></tr>';
+    document.getElementById('acq-loader').style.display = 'none';
+    document.getElementById('acq-table').style.display = '';
+  } catch {
+    document.getElementById('acq-loader').innerHTML = '⚠️ Errore.';
+  }
+}
+
+async function creaListaAcquisti() {
+  const res = await apiFetch(`${API}/acquisti/`, {
+    method: 'POST',
+    body: JSON.stringify({})
+  });
+  if (res.ok) {
+    closeModal('addAcq');
+    showToast('Lista creata!', 'ok');
+    loadAcquisti();
+  } else {
+    showToast('Errore durante la creazione.', 'err');
+  }
+}
+
+async function openAcquisto(id) {
+  currentAcquistoId = id;
+  const res = await apiFetch(`${API}/acquisti/${id}/`);
+  const acq = await res.json();
+
+  const righe = acq.voci.length === 0
+    ? '<tr><td colspan="3" style="text-align:center;color:var(--muted);padding:24px">Nessun componente</td></tr>'
+    : acq.voci.map(v => `
+        <tr>
+          <td>${v.componente_nome}</td>
+          <td>${v.quantita_da_acquistare}</td>
+          <td><button class="btn btn-ghost" style="padding:4px 10px;font-size:0.78rem;color:var(--danger)" onclick="rimuoviComponenteAcquisto(${v.componente})">Rimuovi</button></td>
+        </tr>`).join('');
+
+  document.getElementById('acq-modal-titolo').textContent = `Lista acquisti #${id}`;
+  document.getElementById('acq-modal-tbody').innerHTML = righe;
+
+  if (!allComponents.length) {
+    const r = await apiFetch(`${API}/componenti/`);
+    allComponents = await r.json();
+  }
+  document.getElementById('acq-add-comp').innerHTML = allComponents.map(c =>
+    `<option value="${c.id}">${c.nome}</option>`
+  ).join('');
+
+  document.getElementById('modal-acquisto').classList.add('open');
+}
+
+async function aggiungiComponenteAcquisto() {
+  const compId = document.getElementById('acq-add-comp').value;
+  const qty = document.getElementById('acq-add-qty').value;
+
+  const res = await apiFetch(`${API}/acquisti/${currentAcquistoId}/aggiungi_componente/`, {
+    method: 'POST',
+    body: JSON.stringify({ componente: compId, quantita_da_acquistare: qty })
+  });
+
+  if (res.ok) {
+    showToast('Componente aggiunto!', 'ok');
+    openAcquisto(currentAcquistoId);
+  } else {
+    showToast('Errore durante l\'aggiunta.', 'err');
+  }
+}
+
+async function rimuoviComponenteAcquisto(compId) {
+  const res = await apiFetch(`${API}/acquisti/${currentAcquistoId}/rimuovi_componente/${compId}/`, {
+    method: 'DELETE'
+  });
+  if (res.ok) {
+    showToast('Componente rimosso.', 'ok');
+    openAcquisto(currentAcquistoId);
+  }
+}
+
+async function eliminaAcquisto(id) {
+  if (!confirm('Eliminare questa lista acquisti?')) return;
+  const res = await apiFetch(`${API}/acquisti/${id}/`, { method: 'DELETE' });
+  if (res.ok) {
+    showToast('Lista eliminata.', 'ok');
+    loadAcquisti();
+  }
+}
+
+async function esportaCSV() {
+  const res = await apiFetch(`${API}/acquisti/${currentAcquistoId}/esporta_csv/`);
+  const blob = await res.blob();
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `lista_acquisti_${currentAcquistoId}.csv`;
+  a.click();
+  URL.revokeObjectURL(url);
+}
 
     /* ── UTENTI ── */
     async function loadUtenti() {
