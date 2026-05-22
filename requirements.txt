@@ -5,3 +5,4 @@ cryptography
 channels
 djangorestframework-simplejwt
 django-cors-headers
+django-filter
