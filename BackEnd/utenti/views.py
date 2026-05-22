@@ -36,6 +36,7 @@ class ProfiloView(APIView):
             return Response(serializer.data)
         return Response(serializer.errors, status=400)
 
+
 class ListaUtentiView(generics.ListAPIView):
     serializer_class = UtenteSerializer
     permission_classes = [permissions.IsAuthenticated]
@@ -92,6 +93,7 @@ class LogSerializer(drf_serializers.ModelSerializer):
 
 
 class LogView(generics.ListAPIView):
+    serializer_class = LogSerializer
     permission_classes = [permissions.IsAuthenticated]
 
     def get(self, request, *args, **kwargs):
