@@ -791,6 +791,9 @@
       <a class="nav-link admin-only" style="display:none" onclick="showView('utenti')">
         <span class="icon">👥</span> Utenti
       </a>
+        <a class="nav-link admin-only" style="display:none" onclick="showView('log')">
+  <span class="icon">📋</span> Log Azioni
+</a>
     </nav>
 
     <div class="sidebar-footer">
@@ -1050,6 +1053,21 @@
     <table id="acq-table" style="display:none">
       <thead><tr><th>ID</th><th>Creata il</th><th>Creata da</th><th>Azioni</th></tr></thead>
       <tbody id="acq-tbody"></tbody>
+    </table>
+  </div>
+</div>
+
+   <!--LOG-->
+
+        <div class="view" id="view-log">
+  <div class="table-header">
+    <div class="table-title">Log Azioni</div>
+  </div>
+  <div class="table-wrap">
+    <div class="loader" id="log-loader"><div class="spinner"></div><br>Caricamento…</div>
+    <table id="log-table" style="display:none">
+      <thead><tr><th>Data</th><th>Utente</th><th>Ruolo</th><th>Azione</th></tr></thead>
+      <tbody id="log-tbody"></tbody>
     </table>
   </div>
 </div>
@@ -1516,6 +1534,7 @@ async function loadView(view) {
     if (view === 'famiglie')   loadFamiglie();
     if (view === 'locazioni')  loadLocazioni();
     if (view === 'tags')       loadTags();
+    if (view === 'log') loadLog();
 }
 
     /* ── PROFILE ── */
@@ -2132,6 +2151,27 @@ async function esportaCSV() {
   a.download = `lista_acquisti_${currentAcquistoId}.csv`;
   a.click();
   URL.revokeObjectURL(url);
+}
+
+/*LOG*/
+async function loadLog() {
+  document.getElementById('log-loader').style.display = 'block';
+  document.getElementById('log-table').style.display = 'none';
+  try {
+    const res = await apiFetch(`${API}/auth/log/`);
+    const list = await res.json();
+    document.getElementById('log-tbody').innerHTML = list.map(l => `
+      <tr>
+        <td>${new Date(l.timestamp).toLocaleString('it-IT')}</td>
+        <td>${l.utente?.username ?? '—'}</td>
+        <td>${l.utente?.ruolo ?? '—'}</td>
+        <td>${l.azione}</td>
+      </tr>`).join('') || '<tr><td colspan="4" style="text-align:center;color:var(--muted);padding:24px">Nessuna azione registrata</td></tr>';
+    document.getElementById('log-loader').style.display = 'none';
+    document.getElementById('log-table').style.display = '';
+  } catch {
+    document.getElementById('log-loader').innerHTML = '⚠️ Errore.';
+  }
 }
 
     /* ── UTENTI ── */
